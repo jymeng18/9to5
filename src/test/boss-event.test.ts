@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BossCreepOverlay } from "@/components/game/BossCreepOverlay";
 import { BossCutscenePlayer } from "@/components/game/BossCutscenePlayer";
 import { BossWebcamPrompt } from "@/components/game/BossWebcamPrompt";
+import { PhaseOverlay } from "@/components/game/GameOverlays";
 import {
   BOSS_TURN_COUNTDOWN_MS,
   BOSS_TURN_IN_TIME_CUTSCENE_SRC,
@@ -41,6 +42,43 @@ describe("boss webcam event", () => {
     expect(BOSS_TURN_TOO_LATE_CUTSCENE_SRC).toContain(
       "Sad_Ending_Boss_Sneaking_Up",
     );
+  });
+
+  it("uses a boss-specific wake-up video before the energy game over", () => {
+    const expectedSources = [
+      "First_Boss_Wakeup",
+      "Second_Boss_Wakeup",
+      "Third_Boss_Wakeupp",
+    ] as const;
+
+    ([0, 1, 2] as const).forEach((bossIndex) => {
+      useGameStore.getState().restart();
+      useGameStore.setState({
+        phase: "playing",
+        bossIndex,
+        energy: 0.1,
+        muted: true,
+      });
+      useGameStore.getState().tick();
+
+      expect(useGameStore.getState().phase).toBe("cutscene");
+      expect(useGameStore.getState().cutsceneKind).toBe("wake");
+
+      const { container, unmount } = render(createElement(PhaseOverlay));
+      const video = container.querySelector<HTMLVideoElement>(
+        ".wake-cutscene > video",
+      );
+
+      expect(getBoss(bossIndex).wakeCutscene).toContain(
+        expectedSources[bossIndex],
+      );
+      expect(video?.getAttribute("src")).toContain(expectedSources[bossIndex]);
+      expect(video).not.toHaveAttribute("controls");
+
+      fireEvent.ended(video!);
+      expect(useGameStore.getState().phase).toBe("gameOver");
+      unmount();
+    });
   });
 
   it("keeps a faint friend presence behind the webcam prompt", () => {

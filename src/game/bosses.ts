@@ -1,3 +1,7 @@
+import firstBossWakeup from "@/assets/First_Boss_Wakeup.MP4";
+import secondBossWakeup from "@/assets/Second_Boss_Wakeup.MP4";
+import thirdBossWakeup from "@/assets/Third_Boss_Wakeupp.MP4";
+
 export type BossId = "manager" | "seniorManager" | "vp";
 export type AppId = "files" | "sheets" | "notes" | "break" | "recycle" | "teams";
 export type BossActivity = "reels" | "idle" | "work";
@@ -17,6 +21,7 @@ export interface Boss {
   initials: string;
   photo: string;
   cutscene: string;
+  wakeCutscene: string;
   messageEvery: number;
   callEvery?: number;
   sneakEvery?: number;
@@ -41,6 +46,7 @@ export const BOSSES: Boss[] = [
     initials: "MK",
     photo: "/headshot/mike.jpg",
     cutscene: "/cutscenes/mike_execution.mp4",
+    wakeCutscene: firstBossWakeup,
     messageEvery: 15,
     reactionWindow: 24,
     messages: [
@@ -68,6 +74,7 @@ export const BOSSES: Boss[] = [
     initials: "RY",
     photo: "/headshot/ryan.jpg",
     cutscene: "/cutscenes/ry_execution.mp4",
+    wakeCutscene: secondBossWakeup,
     messageEvery: 12,
     callEvery: 25,
     reactionWindow: 22,
@@ -96,6 +103,7 @@ export const BOSSES: Boss[] = [
     initials: "JM",
     photo: "/headshot/jerry.jpg",
     cutscene: "/cutscenes/jm_execution.mp4",
+    wakeCutscene: thirdBossWakeup,
     messageEvery: 10,
     callEvery: 20,
     sneakEvery: 30,
@@ -135,6 +143,7 @@ const fallbackBoss: Boss = {
   initials: "MK",
   photo: "/headshot/mike.jpg",
   cutscene: "/cutscenes/mike_execution.mp4",
+  wakeCutscene: firstBossWakeup,
   messageEvery: 12,
   reactionWindow: 15,
   messages: ["Please advise."],
