@@ -7,6 +7,8 @@ import { BossCutscenePlayer } from "@/components/game/BossCutscenePlayer";
 import { BossWebcamPrompt } from "@/components/game/BossWebcamPrompt";
 import {
   BOSS_TURN_COUNTDOWN_MS,
+  BOSS_TURN_IN_TIME_CUTSCENE_SRC,
+  BOSS_TURN_TOO_LATE_CUTSCENE_SRC,
   BOSS_WEBCAM_STICKER_SRC,
 } from "@/game/bossEvent";
 import { getBoss } from "@/game/bosses";
@@ -30,6 +32,15 @@ describe("boss webcam event", () => {
       container.querySelector(".boss-creep__figure img")?.getAttribute("src"),
     ).toBe(BOSS_WEBCAM_STICKER_SRC);
     unmount();
+  });
+
+  it("wires the happy and sad ending videos to their outcomes", () => {
+    expect(BOSS_TURN_IN_TIME_CUTSCENE_SRC).toContain(
+      "Happy_Ending_Boss_Sneaking_Up",
+    );
+    expect(BOSS_TURN_TOO_LATE_CUTSCENE_SRC).toContain(
+      "Sad_Ending_Boss_Sneaking_Up",
+    );
   });
 
   it("keeps a faint friend presence behind the webcam prompt", () => {

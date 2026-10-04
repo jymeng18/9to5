@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
+import { BossCutscenePlayer } from "@/components/game/BossCutscenePlayer";
 import { WebcamTurnWindow } from "@/components/game/WebcamTurnWindow";
 import type { BossSide } from "@/components/game/useHeadTurn";
 import {
   BOSS_PEEK_LEFT_TILT_DEGREES,
   BOSS_PEEK_RIGHT_TILT_DEGREES,
+  BOSS_TURN_IN_TIME_CUTSCENE_SRC,
+  BOSS_TURN_TOO_LATE_CUTSCENE_SRC,
   BOSS_WEBCAM_STICKER_SRC,
 } from "@/game/bossEvent";
+import type { BossCutsceneOutcome } from "@/game/store";
 
 export const Route = createFileRoute("/boss-webcam-lab")({
   head: () => ({
@@ -21,6 +25,8 @@ function BossWebcamLab() {
   const [side, setSide] = useState<BossSide>("right");
   const [run, setRun] = useState(0);
   const [result, setResult] = useState("Camera starting…");
+  const [cutscenePreview, setCutscenePreview] =
+    useState<BossCutsceneOutcome | null>(null);
 
   const selectSide = (nextSide: BossSide) => {
     setSide(nextSide);
@@ -66,6 +72,12 @@ function BossWebcamLab() {
             >
               Restart camera
             </button>
+            <button type="button" onClick={() => setCutscenePreview("inTime")}>
+              Preview Happy ending
+            </button>
+            <button type="button" onClick={() => setCutscenePreview("tooLate")}>
+              Preview Sad ending
+            </button>
           </div>
           <p className="boss-webcam-lab__result" role="status">
             {result}
@@ -103,6 +115,23 @@ function BossWebcamLab() {
           onClose={() => void navigate({ to: "/" })}
         />
       </div>
+
+      {cutscenePreview && (
+        <BossCutscenePlayer
+          outcome={cutscenePreview}
+          src={
+            cutscenePreview === "inTime"
+              ? BOSS_TURN_IN_TIME_CUTSCENE_SRC
+              : BOSS_TURN_TOO_LATE_CUTSCENE_SRC
+          }
+          variableName={
+            cutscenePreview === "inTime"
+              ? "BOSS_TURN_IN_TIME_CUTSCENE_SRC"
+              : "BOSS_TURN_TOO_LATE_CUTSCENE_SRC"
+          }
+          onClose={() => setCutscenePreview(null)}
+        />
+      )}
     </main>
   );
 }
