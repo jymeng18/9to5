@@ -5,6 +5,13 @@ import { getEvent, pickEvent } from "./events";
 
 export type Phase = "title" | "playing" | "promotion" | "cutscene" | "gameOver" | "victory";
 export type QteType = null | "message" | "call" | "sneak";
+export type BossEventStage =
+  | "idle"
+  | "creeping"
+  | "prompt"
+  | "webcam"
+  | "cutscene";
+export type BossCutsceneOutcome = "inTime" | "tooLate";
 
 export interface TeamsMessage {
   id: string;
@@ -30,6 +37,8 @@ interface GameState {
   activeQte: QteType;
   qteStep: "incoming" | "unmute";
   caughtMessage: string | null;
+  bossEventStage: BossEventStage;
+  bossCutsceneOutcome: BossCutsceneOutcome | null;
   managementNotices: number;
   activeEventId: string | null;
   activeMessageText: string | null;
@@ -50,6 +59,12 @@ interface GameState {
   advanceQte: () => void;
   failQte: () => void;
   dismissCaught: () => void;
+  startBossEvent: () => void;
+  showBossPrompt: () => void;
+  openBossWebcam: () => void;
+  completeBossTurn: () => void;
+  failBossTurn: () => void;
+  dismissBossEvent: () => void;
   beginPromotion: () => void;
   finishCutscene: () => void;
   restart: () => void;
@@ -74,6 +89,8 @@ const initial = {
   activeQte: null as QteType,
   qteStep: "incoming" as const,
   caughtMessage: null as string | null,
+  bossEventStage: "idle" as BossEventStage,
+  bossCutsceneOutcome: null as BossCutsceneOutcome | null,
   managementNotices: 0,
   activeEventId: null,
   activeMessageText: null,
@@ -162,6 +179,12 @@ export const useGameStore = create<GameState>((set, get) => ({
     caughtMessage: null,
     ...(state.managementNotices >= 3 ? { phase: "gameOver" as const } : {}),
   })),
+  startBossEvent: () => set({ bossEventStage: "creeping", bossCutsceneOutcome: null }),
+  showBossPrompt: () => set({ bossEventStage: "prompt" }),
+  openBossWebcam: () => set({ bossEventStage: "webcam" }),
+  completeBossTurn: () => set({ bossEventStage: "cutscene", bossCutsceneOutcome: "inTime" }),
+  failBossTurn: () => set({ bossEventStage: "cutscene", bossCutsceneOutcome: "tooLate" }),
+  dismissBossEvent: () => set({ bossEventStage: "idle", bossCutsceneOutcome: null }),
   beginPromotion: () => set({ phase: "cutscene", cutsceneKind: "slap" }),
   finishCutscene: () => set((state) => {
     if (state.cutsceneKind === "wake") return { phase: "gameOver" };
