@@ -90,68 +90,156 @@ function NotesApp({ task }: { task: MissionTask | undefined }) {
 
 function BreakRoom() {
   const slides = useMemo(() => [
-    ["Quarterly serenity", "A loading bar reaches 99% and stops."],
-    ["Lunch desk tour", "One yogurt. Three status meetings."],
-    ["Inbox archaeology", "Email threads older than the intern."],
-    ["Leadership quote", "There is no I in unpaid overtime."],
+    { title: "Quarterly serenity", caption: "A loading bar reaches 99% and stops.", author: "@office_zen", likes: "12.4K", comments: "342", emoji: "📊" },
+    { title: "Lunch desk tour", caption: "One yogurt. Three status meetings.", author: "@desk_diaries", likes: "8.7K", comments: "156", emoji: "🍱" },
+    { title: "Inbox archaeology", caption: "Email threads older than the intern.", author: "@corporate_lore", likes: "31.2K", comments: "1.2K", emoji: "📧" },
+    { title: "Leadership quote", caption: "There is no I in unpaid overtime.", author: "@hustle_culture", likes: "45.8K", comments: "2.3K", emoji: "💼" },
+    { title: "Meeting recovery", caption: "That meeting could have been an email.", author: "@zoom_fatigue", likes: "67.1K", comments: "4.1K", emoji: "🎯" },
+    { title: "Coffee run protocol", caption: "Third cup before 10 AM. New personal best.", author: "@caffeine_coder", likes: "22.3K", comments: "890", emoji: "☕" },
   ], []);
   const [index, setIndex] = useState(0);
+  const [liked, setLiked] = useState<Set<number>>(new Set());
+  const [transitioning, setTransitioning] = useState(false);
 
-  const next = () => setIndex((i) => (i + 1) % slides.length);
-  const prev = () => setIndex((i) => (i + slides.length - 1) % slides.length);
+  const navigate = (dir: 1 | -1) => {
+    if (transitioning) return;
+    setTransitioning(true);
+    setIndex((i) => (i + dir + slides.length) % slides.length);
+    setTimeout(() => setTransitioning(false), 450);
+  };
+
+  const toggleLike = (i: number) => {
+    setLiked((prev) => {
+      const s = new Set(prev);
+      if (s.has(i)) s.delete(i); else s.add(i);
+      return s;
+    });
+  };
+
+  const slide = slides[index]!;
 
   return (
     <div
       className="break-app"
       tabIndex={0}
-      onWheel={(event) => {
-        if (event.deltaY > 0) next();
-        else prev();
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "ArrowDown") next();
-        if (event.key === "ArrowUp") prev();
-      }}
+      onWheel={(event) => { if (event.deltaY > 0) navigate(1); else navigate(-1); }}
+      onKeyDown={(event) => { if (event.key === "ArrowDown") navigate(1); if (event.key === "ArrowUp") navigate(-1); }}
     >
-      <div className="phone-video video-variant" data-slide={index}>
-        <div className="phone-status-bar">
-          <span>9:41</span>
-          <div>
-            <span>📶</span> <span>🔋</span>
-          </div>
-        </div>
-        
-        <div className="video-copy">
-          <strong>{slides[index]?.[0]}</strong>
-          <span>{slides[index]?.[1]}</span>
-        </div>
-        
-        <div className="video-controls">
-          <button type="button" onClick={prev} aria-label="Previous">▲</button>
-          <div className="video-action-btn">
-            <span className="icon">🤍</span>
-            <span className="count">12K</span>
-          </div>
-          <div className="video-action-btn">
-            <span className="icon">💬</span>
-            <span className="count">45</span>
-          </div>
-          <div className="video-action-btn">
-            <span className="icon">↗</span>
-            <span className="count">Share</span>
-          </div>
-          <button type="button" onClick={next} aria-label="Next">▼</button>
-        </div>
+      {/* Ambient background */}
+      <div className="reel-bg" data-slide={index}>
+        <div className="reel-bg-grain" />
+        <div className="reel-bg-vignette" />
+      </div>
 
-        <div className="phone-bottom-nav">
-          <span>🏠</span>
-          <span>🔍</span>
-          <span className="add-btn">➕</span>
-          <span>📥</span>
-          <span>👤</span>
+      {/* Floating ambient particles */}
+      <div className="reel-particles" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => (
+          <span key={i} className="reel-particle" style={{ left: `${8 + (i * 7.5) % 84}%`, animationDelay: `${i * 0.7}s`, animationDuration: `${6 + (i % 4) * 2}s` }} />
+        ))}
+      </div>
+
+      {/* Status bar */}
+      <div className="reel-status-bar">
+        <span>9:41</span>
+        <span className="reel-status-label">Reels</span>
+        <div className="reel-status-icons">
+          <span>📶</span>
+          <span>🔋</span>
         </div>
       </div>
-      <div className="energy-float">+3 energy/sec</div>
+
+      {/* Main content area */}
+      <div className={`reel-content ${transitioning ? "reel-transitioning" : ""}`}>
+        <div className="reel-emoji-backdrop" aria-hidden="true">{slide.emoji}</div>
+
+        {/* Bottom overlay info */}
+        <div className="reel-info">
+          <div className="reel-author-row">
+            <div className="reel-avatar">{slide.author[1]?.toUpperCase()}</div>
+            <span className="reel-author-name">{slide.author}</span>
+            <button type="button" className="reel-follow-btn">Follow</button>
+          </div>
+          <h3 className="reel-title">{slide.title}</h3>
+          <p className="reel-caption">{slide.caption}</p>
+          <div className="reel-music-row">
+            <span className="reel-music-icon">♫</span>
+            <span className="reel-music-text">Original Audio — {slide.author}</span>
+            <div className="reel-disc">
+              <span className="reel-disc-inner">{slide.emoji}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Side action buttons */}
+      <div className="reel-actions">
+        <button type="button" className={`reel-action-btn ${liked.has(index) ? "reel-liked" : ""}`} onClick={() => toggleLike(index)}>
+          <span className="reel-action-icon">{liked.has(index) ? "❤️" : "🤍"}</span>
+          <span className="reel-action-label">{slide.likes}</span>
+        </button>
+        <button type="button" className="reel-action-btn">
+          <span className="reel-action-icon">💬</span>
+          <span className="reel-action-label">{slide.comments}</span>
+        </button>
+        <button type="button" className="reel-action-btn">
+          <span className="reel-action-icon">↗️</span>
+          <span className="reel-action-label">Share</span>
+        </button>
+        <button type="button" className="reel-action-btn">
+          <span className="reel-action-icon">⋯</span>
+        </button>
+      </div>
+
+      {/* Navigation dots */}
+      <div className="reel-nav-dots">
+        {slides.map((_, i) => (
+          <button key={i} type="button" className={`reel-dot ${i === index ? "reel-dot-active" : ""}`} onClick={() => { setIndex(i); }} aria-label={`Go to slide ${i + 1}`} />
+        ))}
+      </div>
+
+      {/* Scroll hint arrows */}
+      <div className="reel-scroll-hint">
+        <button type="button" className="reel-scroll-arrow" onClick={() => navigate(-1)} aria-label="Previous" disabled={transitioning}>
+          <span>‹</span>
+        </button>
+        <button type="button" className="reel-scroll-arrow" onClick={() => navigate(1)} aria-label="Next" disabled={transitioning}>
+          <span>›</span>
+        </button>
+      </div>
+
+      {/* Bottom navigation bar */}
+      <div className="reel-bottom-nav">
+        <div className="reel-nav-item reel-nav-active">
+          <span>🏠</span>
+          <span>Home</span>
+        </div>
+        <div className="reel-nav-item">
+          <span>🔍</span>
+          <span>Explore</span>
+        </div>
+        <div className="reel-nav-item reel-nav-create">
+          <span>＋</span>
+        </div>
+        <div className="reel-nav-item">
+          <span>📥</span>
+          <span>Inbox</span>
+        </div>
+        <div className="reel-nav-item">
+          <span>👤</span>
+          <span>Profile</span>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="reel-progress">
+        <div className="reel-progress-fill" />
+      </div>
+
+      {/* Energy indicator */}
+      <div className="energy-float">
+        <span className="energy-float-icon">⚡</span>
+        +3 energy/sec
+      </div>
     </div>
   );
 }
