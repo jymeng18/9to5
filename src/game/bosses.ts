@@ -15,6 +15,8 @@ export interface Boss {
   name: string;
   title: string;
   initials: string;
+  photo: string;
+  cutscene: string;
   messageEvery: number;
   callEvery?: number;
   sneakEvery?: number;
@@ -34,9 +36,11 @@ const task = (
 export const BOSSES: Boss[] = [
   {
     id: "manager",
-    name: "Gary",
+    name: "Mike",
     title: "Manager",
-    initials: "GM",
+    initials: "MK",
+    photo: "/headshot/mike.jpg",
+    cutscene: "/cutscenes/mike_execution.mp4",
     messageEvery: 15,
     reactionWindow: 14,
     messages: [
@@ -59,9 +63,11 @@ export const BOSSES: Boss[] = [
   },
   {
     id: "seniorManager",
-    name: "Denise",
+    name: "Ryan",
     title: "Senior Manager",
-    initials: "DS",
+    initials: "RY",
+    photo: "/headshot/ryan.jpg",
+    cutscene: "/cutscenes/ry_execution.mp4",
     messageEvery: 12,
     callEvery: 25,
     reactionWindow: 12,
@@ -85,9 +91,11 @@ export const BOSSES: Boss[] = [
   },
   {
     id: "vp",
-    name: "Richard",
+    name: "Jerry",
     title: "Vice President",
-    initials: "RV",
+    initials: "JM",
+    photo: "/headshot/jerry.jpg",
+    cutscene: "/cutscenes/jm_execution.mp4",
     messageEvery: 10,
     callEvery: 20,
     sneakEvery: 30,
@@ -122,9 +130,11 @@ export function getBoss(index: 0 | 1 | 2): Boss {
 
 const fallbackBoss: Boss = {
   id: "manager",
-  name: "Gary",
+  name: "Mike",
   title: "Manager",
-  initials: "GM",
+  initials: "MK",
+  photo: "/headshot/mike.jpg",
+  cutscene: "/cutscenes/mike_execution.mp4",
   messageEvery: 12,
   reactionWindow: 5,
   messages: ["Please advise."],

@@ -1,18 +1,21 @@
 import { Fragment, useRef, useState, useEffect, useMemo } from "react";
-import { getBoss } from "@/game/bosses";
+import { getBoss, type Boss } from "@/game/bosses";
 import { getEvent } from "@/game/events";
 import { useGameStore } from "@/game/store";
 
 const AVATAR_COLORS = [
-  "oklch(0.52 0.22 260)",   // Gary — blue
-  "oklch(0.47 0.17 145)",   // Denise — green
-  "oklch(0.50 0.20 20)",    // Richard — red
+  "oklch(0.52 0.22 260)",   // Mike — blue
+  "oklch(0.47 0.17 145)",   // Ryan — green
+  "oklch(0.50 0.20 20)",    // Jerry — red
 ] as const;
 
-function BossAvatar({ initials, bossIdx, isPlayer }: { initials: string; bossIdx: number; isPlayer?: boolean }) {
+function BossAvatar({ boss, bossIdx, isPlayer }: { boss: Boss; bossIdx: number; isPlayer?: boolean }) {
+  if (isPlayer) {
+    return <div className="teams-avatar" style={{ background: "oklch(0.60 0.10 240)" }}>ME</div>;
+  }
   return (
-    <div className="teams-avatar" style={{ background: isPlayer ? "oklch(0.60 0.10 240)" : AVATAR_COLORS[bossIdx as 0|1|2] }}>
-      {initials}
+    <div className="teams-avatar" style={{ background: AVATAR_COLORS[bossIdx as 0|1|2] }}>
+      <img src={boss.photo} alt={boss.name} />
     </div>
   );
 }
@@ -87,7 +90,7 @@ export function TeamsApp() {
               className={`teams-dm-row${teamsActiveDm === idx ? " active" : ""}`}
               onClick={() => setTeamsActiveDm(idx)}
             >
-              <BossAvatar initials={boss.initials} bossIdx={idx} />
+              <BossAvatar boss={boss} bossIdx={idx} />
               <span className="teams-dm-name">
                 <strong>{boss.name}</strong>
                 <small>{boss.title}</small>
@@ -112,7 +115,7 @@ export function TeamsApp() {
         ) : (
           <>
             <header className="teams-chat-header">
-              <BossAvatar initials={activeBoss.initials} bossIdx={teamsActiveDm} />
+              <BossAvatar boss={activeBoss} bossIdx={teamsActiveDm} />
               <div>
                 <strong>{activeBoss.name}</strong>
                 <small><span className="teams-status-dot" /> {activeBoss.title} · Direct message</small>
@@ -139,7 +142,7 @@ export function TeamsApp() {
                     {startsNewSession && <div className="teams-session-divider" />}
                     <div className={`teams-msg ${isPlayer ? "player" : ""}`}>
                       <BossAvatar 
-                        initials={isPlayer ? "ME" : activeBoss.initials} 
+                        boss={activeBoss} 
                         bossIdx={teamsActiveDm} 
                         isPlayer={isPlayer} 
                       />

@@ -37,7 +37,7 @@ export function Game() {
 }
 
 function LoginScreen({ onStart }: { onStart: () => void }) {
-  return <main className="login-screen"><div className="login-top" /><div className="login-center"><section className="login-brand"><div className="flag-logo"><span /><span /><span /><span /></div><h1>9to5<sup>™</sup></h1><p>corporate edition</p></section><div className="login-divider" /><section className="user-login"><button type="button" className="user-tile" onClick={onStart}><span className="employee-photo">👔</span><span><strong>New Hire</strong><small>Reports to: Gary</small></span><b>➜</b></button><p>To begin, click your user name</p></section></div><footer className="login-footer"><button type="button">⏻ Turn off computer</button><p>After you log on, you can spend the next eight hours<br />demonstrating visible productivity.</p></footer></main>;
+  return <main className="login-screen"><div className="login-top" /><div className="login-center"><section className="login-brand"><div className="flag-logo"><span /><span /><span /><span /></div><h1>9to5<sup>™</sup></h1><p>corporate edition</p></section><div className="login-divider" /><section className="user-login"><button type="button" className="user-tile" onClick={onStart}><span className="employee-photo">👔</span><span><strong>New Hire</strong><small>Reports to: Mike</small></span><b>➜</b></button><p>To begin, click your user name</p></section></div><footer className="login-footer"><button type="button">⏻ Turn off computer</button><p>After you log on, you can spend the next eight hours<br />demonstrating visible productivity.</p></footer></main>;
 }
 
 function Desktop() {
@@ -80,7 +80,7 @@ function Desktop() {
   return <main className="desktop" style={{ backgroundImage: `url(${wallpaper})` }} onMouseDown={() => setStartOpen(false)}>
     <div className="desktop-shade" />
     <aside className="desktop-icons">{icons.map((item) => <button type="button" key={item.app} className="desktop-icon" onDoubleClick={() => openApp(item.app)} onClick={(event) => { if (event.detail === 1) focusApp(item.app); }}><span className={`desktop-glyph ${item.app}`}>{item.image ? <img src={item.image} alt="" width={32} height={32} /> : item.glyph}</span><span>{item.label}</span></button>)}</aside>
-    <section className={`career-window ${xp === 100 ? "full" : ""}`}><header><div className="boss-avatar tiny">{boss.initials}</div><strong>Career Progress</strong></header><div className="career-body"><Progress label="XP" value={xp} tone="green" /><Progress label="Energy" value={energy} tone={energy < 25 ? "red" : "amber"} /><p>Reporting to: <strong>{boss.name}, {boss.title}</strong></p></div></section>
+    <section className={`career-window ${xp === 100 ? "full" : ""}`}><header><div className="boss-avatar tiny"><img src={boss.photo} alt={boss.name} /></div><strong>Career Progress</strong></header><div className="career-body"><Progress label="XP" value={xp} tone="green" /><Progress label="Energy" value={energy} tone={energy < 25 ? "red" : "amber"} /><p>Reporting to: <strong>{boss.name}, {boss.title}</strong></p></div></section>
     <section className="priorities"><header>Today's Priorities</header><p>{boss.title}'s critical path</p><ul>{boss.missions.map((mission) => <li key={mission.id} className={completed.includes(mission.id) ? "done" : ""}><span>{completed.includes(mission.id) ? "☑" : "☐"}</span><button type="button" onClick={() => openApp(mission.app)}>{mission.label}</button></li>)}</ul><footer>{completed.length} of 5 complete</footer></section>
     <button
       type="button"
