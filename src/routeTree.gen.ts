@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BossWebcamLabRouteImport } from './routes/boss-webcam-lab'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BossWebcamLabRoute = BossWebcamLabRouteImport.update({
+  id: '/boss-webcam-lab',
+  path: '/boss-webcam-lab',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/boss-webcam-lab': typeof BossWebcamLabRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/boss-webcam-lab': typeof BossWebcamLabRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/boss-webcam-lab': typeof BossWebcamLabRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/boss-webcam-lab'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/boss-webcam-lab'
+  id: '__root__' | '/' | '/boss-webcam-lab'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BossWebcamLabRoute: typeof BossWebcamLabRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/boss-webcam-lab': {
+      id: '/boss-webcam-lab'
+      path: '/boss-webcam-lab'
+      fullPath: '/boss-webcam-lab'
+      preLoaderRoute: typeof BossWebcamLabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BossWebcamLabRoute: BossWebcamLabRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

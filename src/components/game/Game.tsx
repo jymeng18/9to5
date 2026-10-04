@@ -1,11 +1,24 @@
 import { useEffect, useState } from "react";
 import { getBoss, type AppId } from "@/game/bosses";
+import {
+  BOSS_TURN_IN_TIME_CUTSCENE_SRC,
+  BOSS_TURN_TOO_LATE_CUTSCENE_SRC,
+} from "@/game/bossEvent";
+import {
+  armBossEventAudio,
+  startBossEventFootsteps,
+  stopBossEventFootsteps,
+} from "@/game/bossEventAudio";
 import { useGameStore } from "@/game/store";
 import wallpaper from "@/assets/corporate-office.jpg";
 import notepadIcon from "@/assets/xp/notepad.png";
 import computerIcon from "@/assets/xp/computer.png";
+import { BossCreepOverlay } from "./BossCreepOverlay";
+import { BossCutscenePlayer } from "./BossCutscenePlayer";
+import { BossWebcamPrompt } from "./BossWebcamPrompt";
 import { PhaseOverlay, QteOverlay, SleepyOverlay } from "./GameOverlays";
 import { TaskApps } from "./TaskApps";
+import { WebcamTurnWindow } from "./WebcamTurnWindow";
 
 const icons: Array<{ app: AppId; label: string; image?: string; glyph?: string }> = [
   { app: "files", label: "Documents", image: computerIcon },
@@ -43,9 +56,25 @@ function Desktop() {
   const caughtMessage = useGameStore((state) => state.caughtMessage);
   const managementNotices = useGameStore((state) => state.managementNotices);
   const dismissCaught = useGameStore((state) => state.dismissCaught);
+  const bossEventStage = useGameStore((state) => state.bossEventStage);
+  const bossCutsceneOutcome = useGameStore((state) => state.bossCutsceneOutcome);
+  const startBossEvent = useGameStore((state) => state.startBossEvent);
+  const showBossPrompt = useGameStore((state) => state.showBossPrompt);
+  const openBossWebcam = useGameStore((state) => state.openBossWebcam);
+  const completeBossTurn = useGameStore((state) => state.completeBossTurn);
+  const failBossTurn = useGameStore((state) => state.failBossTurn);
+  const dismissBossEvent = useGameStore((state) => state.dismissBossEvent);
   const [startOpen, setStartOpen] = useState(false);
   const boss = getBoss(bossIndex);
   useEffect(() => { const timer = window.setInterval(tick, 1000); return () => window.clearInterval(timer); }, [tick]);
+  useEffect(() => {
+    if (bossEventStage === "creeping" && !muted) {
+      startBossEventFootsteps(false);
+    } else {
+      stopBossEventFootsteps();
+    }
+    return stopBossEventFootsteps;
+  }, [bossEventStage, muted]);
   const hour = 9 + Math.floor((xp / 100) * 8);
 
   return <main className="desktop" style={{ backgroundImage: `url(${wallpaper})` }} onMouseDown={() => setStartOpen(false)}>
@@ -53,9 +82,61 @@ function Desktop() {
     <aside className="desktop-icons">{icons.map((item) => <button type="button" key={item.app} className="desktop-icon" onDoubleClick={() => openApp(item.app)} onClick={(event) => { if (event.detail === 1) focusApp(item.app); }}><span className={`desktop-glyph ${item.app}`}>{item.image ? <img src={item.image} alt="" width={32} height={32} /> : item.glyph}</span><span>{item.label}</span></button>)}</aside>
     <section className={`career-window ${xp === 100 ? "full" : ""}`}><header><div className="boss-avatar tiny">{boss.initials}</div><strong>Career Progress</strong></header><div className="career-body"><Progress label="XP" value={xp} tone="green" /><Progress label="Energy" value={energy} tone={energy < 25 ? "red" : "amber"} /><p>Reporting to: <strong>{boss.name}, {boss.title}</strong></p></div></section>
     <section className="priorities"><header>Today's Priorities</header><p>{boss.title}'s critical path</p><ul>{boss.missions.map((mission) => <li key={mission.id} className={completed.includes(mission.id) ? "done" : ""}><span>{completed.includes(mission.id) ? "☑" : "☐"}</span><button type="button" onClick={() => openApp(mission.app)}>{mission.label}</button></li>)}</ul><footer>{completed.length} of 5 complete</footer></section>
+    <button
+      type="button"
+      className="boss-creep-trigger"
+      aria-pressed={bossEventStage !== "idle"}
+      onMouseDown={(event) => event.stopPropagation()}
+      onClick={() => {
+        if (bossEventStage === "idle") {
+          armBossEventAudio();
+          startBossEvent();
+        } else {
+          dismissBossEvent();
+        }
+      }}
+    >
+      {bossEventStage === "idle" ? "Trigger boss shadow" : "Dismiss boss event"}
+    </button>
     <TaskApps />
     <SleepyOverlay />
     <QteOverlay />
+    <BossCreepOverlay
+      active={bossEventStage === "creeping"}
+      duration={8000}
+      onCaught={() => {
+        stopBossEventFootsteps();
+        showBossPrompt();
+      }}
+    />
+    {bossEventStage === "prompt" && (
+      <BossWebcamPrompt muted={muted} onOpen={openBossWebcam} />
+    )}
+    {bossEventStage === "webcam" && (
+      <div className="boss-webcam-scrim">
+        <WebcamTurnWindow
+          onTurnDetected={completeBossTurn}
+          onTimedOut={failBossTurn}
+          onClose={dismissBossEvent}
+        />
+      </div>
+    )}
+    {bossEventStage === "cutscene" && bossCutsceneOutcome && (
+      <BossCutscenePlayer
+        outcome={bossCutsceneOutcome}
+        src={
+          bossCutsceneOutcome === "inTime"
+            ? BOSS_TURN_IN_TIME_CUTSCENE_SRC
+            : BOSS_TURN_TOO_LATE_CUTSCENE_SRC
+        }
+        variableName={
+          bossCutsceneOutcome === "inTime"
+            ? "BOSS_TURN_IN_TIME_CUTSCENE_SRC"
+            : "BOSS_TURN_TOO_LATE_CUTSCENE_SRC"
+        }
+        onClose={dismissBossEvent}
+      />
+    )}
     {caughtMessage && (
       <div className="qte-scrim dramatic-scrim" role="presentation">
         <section className="caught-modal" role="alertdialog" aria-modal="true" aria-labelledby="caught-modal-title" aria-describedby="caught-modal-description">
