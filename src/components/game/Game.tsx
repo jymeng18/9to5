@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getBoss, type AppId } from "@/game/bosses";
 import {
   BOSS_TURN_IN_TIME_CUTSCENE_SRC,
@@ -9,7 +9,9 @@ import {
   startBossEventFootsteps,
   stopBossEventFootsteps,
 } from "@/game/bossEventAudio";
+import { setBackgroundMusicDesired } from "@/game/backgroundMusic";
 import { useGameStore } from "@/game/store";
+import { playTeamsNotification } from "@/game/teamsAudio";
 import wallpaper from "@/assets/corporate-office.jpg";
 import notepadIcon from "@/assets/xp/notepad.png";
 import computerIcon from "@/assets/xp/computer.png";
@@ -32,7 +34,15 @@ const icons: Array<{ app: AppId; label: string; image?: string; glyph?: string }
 export function Game() {
   const phase = useGameStore((state) => state.phase);
   const start = useGameStore((state) => state.start);
-  if (phase === "title") return <LoginScreen onStart={start} />;
+  if (phase === "title")
+    return (
+      <LoginScreen
+        onStart={() => {
+          setBackgroundMusicDesired(true);
+          start();
+        }}
+      />
+    );
   return <Desktop />;
 }
 
@@ -42,6 +52,7 @@ function LoginScreen({ onStart }: { onStart: () => void }) {
 
 function Desktop() {
   const bossIndex = useGameStore((state) => state.bossIndex);
+  const phase = useGameStore((state) => state.phase);
   const xp = useGameStore((state) => state.xp);
   const energy = useGameStore((state) => state.energy);
   const completed = useGameStore((state) => state.completed);
@@ -55,6 +66,8 @@ function Desktop() {
   const toggleMute = useGameStore((state) => state.toggleMute);
   const caughtMessage = useGameStore((state) => state.caughtMessage);
   const managementNotices = useGameStore((state) => state.managementNotices);
+  const activeQte = useGameStore((state) => state.activeQte);
+  const teamsMessages = useGameStore((state) => state.teamsMessages);
   const dismissCaught = useGameStore((state) => state.dismissCaught);
   const bossEventStage = useGameStore((state) => state.bossEventStage);
   const bossCutsceneOutcome = useGameStore((state) => state.bossCutsceneOutcome);
@@ -66,7 +79,18 @@ function Desktop() {
   const dismissBossEvent = useGameStore((state) => state.dismissBossEvent);
   const [startOpen, setStartOpen] = useState(false);
   const boss = getBoss(bossIndex);
+  const mutedRef = useRef(muted);
+  const bossMessageCountRef = useRef(0);
+  useEffect(() => { mutedRef.current = muted; }, [muted]);
   useEffect(() => { const timer = window.setInterval(tick, 1000); return () => window.clearInterval(timer); }, [tick]);
+  const eventActive = activeQte !== null || caughtMessage !== null;
+  const musicShouldPlay = !muted && phase === "playing" && !eventActive && bossEventStage === "idle";
+  useEffect(() => { setBackgroundMusicDesired(musicShouldPlay); }, [musicShouldPlay]);
+  useEffect(() => {
+    const bossMessageCount = teamsMessages.reduce((total, message) => total + (message.sender === "boss" ? 1 : 0), 0);
+    if (bossMessageCount > bossMessageCountRef.current) playTeamsNotification(mutedRef.current);
+    bossMessageCountRef.current = bossMessageCount;
+  }, [teamsMessages]);
   useEffect(() => {
     if (bossEventStage === "creeping" && !muted) {
       startBossEventFootsteps(false);
