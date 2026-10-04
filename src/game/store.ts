@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { BALANCE } from "./balance";
 import { getBoss, type AppId } from "./bosses";
 import { askBoss } from "./bossChat";
+import { armBossEventAudio } from "./bossEventAudio";
 import { getEvent, pickEvent } from "./events";
 
 export type Phase = "title" | "playing" | "promotion" | "cutscene" | "gameOver" | "victory";
@@ -66,6 +67,7 @@ interface GameState {
   completeBossTurn: () => void;
   failBossTurn: () => void;
   dismissBossEvent: () => void;
+  finishBossEvent: () => void;
   beginPromotion: () => void;
   finishCutscene: () => void;
   restart: () => void;
@@ -119,10 +121,23 @@ export const useGameStore = create<GameState>((set, get) => ({
   minimizeApp: (app) => set((state) => ({ minimizedApps: [...new Set([...state.minimizedApps, app])], focusedApp: state.focusedApp === app ? null : state.focusedApp, scrollSeconds: app === "break" ? 0 : state.scrollSeconds })),
   closeApp: (app) => set((state) => ({ openApps: state.openApps.filter((item) => item !== app), minimizedApps: state.minimizedApps.filter((item) => item !== app), focusedApp: state.focusedApp === app ? null : state.focusedApp, scrollSeconds: app === "break" ? 0 : state.scrollSeconds })),
   completeTask: (id) => set((state) => {
-    const valid = getBoss(state.bossIndex).missions.some((mission) => mission.id === id);
+    const boss = getBoss(state.bossIndex);
+    const valid = boss.missions.some((mission) => mission.id === id);
     if (!valid || state.completed.includes(id) || state.phase !== "playing") return state;
+    const completed = [...state.completed, id];
     const xp = Math.min(100, state.xp + BALANCE.taskXp);
-    return { completed: [...state.completed, id], xp, energy: Math.max(0, state.energy - BALANCE.taskEnergy), phase: xp >= 100 ? "promotion" : state.phase };
+    const startsBossEvent =
+      state.bossIndex === 2 && completed.length === boss.missions.length - 1;
+    if (startsBossEvent) armBossEventAudio();
+    return {
+      completed,
+      xp,
+      energy: Math.max(0, state.energy - BALANCE.taskEnergy),
+      phase: xp >= 100 ? "promotion" : state.phase,
+      ...(startsBossEvent
+        ? { bossEventStage: "creeping" as const, bossCutsceneOutcome: null }
+        : {}),
+    };
   }),
   tick: () => set((state) => {
     if (state.phase !== "playing" || state.activeQte || state.bossEventStage !== "idle") return state;
@@ -186,6 +201,13 @@ export const useGameStore = create<GameState>((set, get) => ({
   completeBossTurn: () => set({ bossEventStage: "cutscene", bossCutsceneOutcome: "inTime" }),
   failBossTurn: () => set({ bossEventStage: "cutscene", bossCutsceneOutcome: "tooLate" }),
   dismissBossEvent: () => set({ bossEventStage: "idle", bossCutsceneOutcome: null }),
+  finishBossEvent: () => set((state) => ({
+    bossEventStage: "idle",
+    bossCutsceneOutcome: null,
+    ...(state.bossCutsceneOutcome === "tooLate"
+      ? { phase: "gameOver" as const }
+      : {}),
+  })),
   beginPromotion: () => set({ phase: "cutscene", cutsceneKind: "slap" }),
   finishCutscene: () => set((state) => {
     if (state.cutsceneKind === "wake") return { phase: "gameOver" };
