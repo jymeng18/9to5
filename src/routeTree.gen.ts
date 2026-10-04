@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BossWebcamLabRouteImport } from './routes/boss-webcam-lab'
+import { Route as DeniseRouteImport } from './routes/denise'
+import { Route as GaryRouteImport } from './routes/gary'
+import { Route as RichardRouteImport } from './routes/richard'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +25,58 @@ const BossWebcamLabRoute = BossWebcamLabRouteImport.update({
   path: '/boss-webcam-lab',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DeniseRoute = DeniseRouteImport.update({
+  id: '/denise',
+  path: '/denise',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GaryRoute = GaryRouteImport.update({
+  id: '/gary',
+  path: '/gary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RichardRoute = RichardRouteImport.update({
+  id: '/richard',
+  path: '/richard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/boss-webcam-lab': typeof BossWebcamLabRoute
+  '/denise': typeof DeniseRoute
+  '/gary': typeof GaryRoute
+  '/richard': typeof RichardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/boss-webcam-lab': typeof BossWebcamLabRoute
+  '/denise': typeof DeniseRoute
+  '/gary': typeof GaryRoute
+  '/richard': typeof RichardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/boss-webcam-lab': typeof BossWebcamLabRoute
+  '/denise': typeof DeniseRoute
+  '/gary': typeof GaryRoute
+  '/richard': typeof RichardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/boss-webcam-lab'
+  fullPaths: '/' | '/boss-webcam-lab' | '/denise' | '/gary' | '/richard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/boss-webcam-lab'
-  id: '__root__' | '/' | '/boss-webcam-lab'
+  to: '/' | '/boss-webcam-lab' | '/denise' | '/gary' | '/richard'
+  id: '__root__' | '/' | '/boss-webcam-lab' | '/denise' | '/gary' | '/richard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BossWebcamLabRoute: typeof BossWebcamLabRoute
+  DeniseRoute: typeof DeniseRoute
+  GaryRoute: typeof GaryRoute
+  RichardRoute: typeof RichardRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +95,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BossWebcamLabRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/denise': {
+      id: '/denise'
+      path: '/denise'
+      fullPath: '/denise'
+      preLoaderRoute: typeof DeniseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gary': {
+      id: '/gary'
+      path: '/gary'
+      fullPath: '/gary'
+      preLoaderRoute: typeof GaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/richard': {
+      id: '/richard'
+      path: '/richard'
+      fullPath: '/richard'
+      preLoaderRoute: typeof RichardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BossWebcamLabRoute: BossWebcamLabRoute,
+  DeniseRoute: DeniseRoute,
+  GaryRoute: GaryRoute,
+  RichardRoute: RichardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

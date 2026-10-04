@@ -1,3 +1,6 @@
+import happyEndingCutscene from "@/assets/Happy_Ending_Boss_Sneaking_Up.MP4";
+import sadEndingCutscene from "@/assets/Sad_Ending_Boss_Sneaking_Up.MP4";
+
 export const BOSS_TURN_COUNTDOWN_MS = 10_000;
 
 // Webcam silhouette tuning. Positive degrees tilt inward from the visible edge.
@@ -10,9 +13,8 @@ export const BOSS_PEEK_TOP_RATIO = 0.15;
 // Set this to a transparent PNG/WebP path, for example "/stickers/friend.png".
 export const BOSS_WEBCAM_STICKER_SRC = "/stickers/friend.png";
 
-// Set these to public-root MP4 paths, for example "/cutscenes/my-scene.mp4".
-export const BOSS_TURN_IN_TIME_CUTSCENE_SRC = "";
-export const BOSS_TURN_TOO_LATE_CUTSCENE_SRC = "";
+export const BOSS_TURN_IN_TIME_CUTSCENE_SRC = happyEndingCutscene;
+export const BOSS_TURN_TOO_LATE_CUTSCENE_SRC = sadEndingCutscene;
 
 export const BOSS_WEBCAM_PROMPT =
   "Something feels off… maybe I should open the webcam.";

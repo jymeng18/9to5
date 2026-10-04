@@ -16,16 +16,14 @@ export function BossCutscenePlayer({
 }: BossCutscenePlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [needsPlay, setNeedsPlay] = useState(false);
-  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     setNeedsPlay(false);
-    setFailed(false);
     if (!src || !videoRef.current) return;
     void videoRef.current.play().catch(() => setNeedsPlay(true));
   }, [src]);
 
-  if (!src || failed) {
+  if (!src) {
     return (
       <div className="boss-cutscene-stage">
         <section className="xp-dialog boss-cutscene-missing" role="alert">
@@ -35,9 +33,7 @@ export function BossCutscenePlayer({
               🎬
             </span>
             <p>
-              {failed
-                ? "The configured MP4 could not be played."
-                : "MP4 source not configured."}
+              MP4 source not configured.
               <small>
                 Set <code>{variableName}</code> in{" "}
                 <code>src/game/bossEvent.ts</code>.
@@ -56,14 +52,15 @@ export function BossCutscenePlayer({
 
   return (
     <section className="boss-cutscene-stage" aria-label={`${outcome} cutscene`}>
-      <video
-        ref={videoRef}
-        src={src}
-        playsInline
-        controls
-        onEnded={onClose}
-        onError={() => setFailed(true)}
-      />
+      <div className="boss-cutscene-frame">
+        <video
+          ref={videoRef}
+          src={src}
+          playsInline
+          onEnded={onClose}
+          onError={onClose}
+        />
+      </div>
       {needsPlay && (
         <button
           type="button"

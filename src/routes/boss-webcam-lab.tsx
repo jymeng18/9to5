@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
+import { BossCutscenePlayer } from "@/components/game/BossCutscenePlayer";
 import { WebcamTurnWindow } from "@/components/game/WebcamTurnWindow";
 import type { BossSide } from "@/components/game/useHeadTurn";
 import {
   BOSS_PEEK_LEFT_TILT_DEGREES,
   BOSS_PEEK_RIGHT_TILT_DEGREES,
+  BOSS_TURN_IN_TIME_CUTSCENE_SRC,
+  BOSS_TURN_TOO_LATE_CUTSCENE_SRC,
   BOSS_WEBCAM_STICKER_SRC,
 } from "@/game/bossEvent";
+import { nextCameraRun } from "@/game/bossWebcamLab";
+import type { BossCutsceneOutcome } from "@/game/store";
 
 export const Route = createFileRoute("/boss-webcam-lab")({
   head: () => ({
@@ -19,17 +24,41 @@ export const Route = createFileRoute("/boss-webcam-lab")({
 function BossWebcamLab() {
   const navigate = useNavigate();
   const [side, setSide] = useState<BossSide>("right");
-  const [run, setRun] = useState(0);
-  const [result, setResult] = useState("Camera starting…");
+  const [cameraRun, setCameraRun] = useState<number | null>(null);
+  const [result, setResult] = useState(
+    "Camera is off. Ending previews are ready.",
+  );
+  const [cutscenePreview, setCutscenePreview] =
+    useState<BossCutsceneOutcome | null>(null);
 
   const selectSide = (nextSide: BossSide) => {
     setSide(nextSide);
     setResult(`${nextSide === "right" ? "Right" : "Left"} preview starting…`);
-    setRun((current) => current + 1);
+    setCameraRun(nextCameraRun);
   };
 
   return (
     <main className="boss-webcam-lab">
+      <section
+        className="xp-window boss-webcam-lab__ending-controls"
+        aria-labelledby="ending-preview-title"
+      >
+        <header className="xp-titlebar">
+          <div className="xp-title" id="ending-preview-title">
+            🎬 Boss sneak ending previews
+          </div>
+        </header>
+        <div>
+          <p>Play either configured cutscene without starting the webcam.</p>
+          <button type="button" onClick={() => setCutscenePreview("inTime")}>
+            ▶ Play Happy ending
+          </button>
+          <button type="button" onClick={() => setCutscenePreview("tooLate")}>
+            ▶ Play Sad ending
+          </button>
+        </div>
+      </section>
+
       <aside className="xp-window boss-webcam-lab__panel">
         <header className="xp-titlebar">
           <div className="xp-title">
@@ -60,11 +89,11 @@ function BossWebcamLab() {
             <button
               type="button"
               onClick={() => {
-                setResult("Preview restarting…");
-                setRun((current) => current + 1);
+                setResult("Camera preview starting…");
+                setCameraRun(nextCameraRun);
               }}
             >
-              Restart camera
+              Start / restart camera
             </button>
           </div>
           <p className="boss-webcam-lab__result" role="status">
@@ -94,15 +123,54 @@ function BossWebcamLab() {
         </div>
       </aside>
 
-      <div className="boss-webcam-lab__preview" key={`${side}-${run}`}>
-        <WebcamTurnWindow
-          countdownMs={60_000}
-          forcedBossSide={side}
-          onTurnDetected={() => setResult("In-time turn detected.")}
-          onTimedOut={() => setResult("The 60-second lab timer expired.")}
-          onClose={() => void navigate({ to: "/" })}
-        />
+      <div className="boss-webcam-lab__preview" key={`${side}-${cameraRun}`}>
+        {cameraRun === null ? (
+          <section className="xp-window boss-webcam-lab__camera-idle">
+            <header className="xp-titlebar">Webcam preview</header>
+            <p>The camera stays off until you start the tuning preview.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setResult("Camera preview starting…");
+                setCameraRun(1);
+              }}
+            >
+              Start camera preview
+            </button>
+          </section>
+        ) : (
+          <WebcamTurnWindow
+            countdownMs={60_000}
+            forcedBossSide={side}
+            onTurnDetected={() => {
+              setResult("In-time turn detected. Restarting camera preview…");
+              setCameraRun(nextCameraRun);
+            }}
+            onTimedOut={() => {
+              setResult("The lab timer expired. Restarting camera preview…");
+              setCameraRun(nextCameraRun);
+            }}
+            onClose={() => void navigate({ to: "/" })}
+          />
+        )}
       </div>
+
+      {cutscenePreview && (
+        <BossCutscenePlayer
+          outcome={cutscenePreview}
+          src={
+            cutscenePreview === "inTime"
+              ? BOSS_TURN_IN_TIME_CUTSCENE_SRC
+              : BOSS_TURN_TOO_LATE_CUTSCENE_SRC
+          }
+          variableName={
+            cutscenePreview === "inTime"
+              ? "BOSS_TURN_IN_TIME_CUTSCENE_SRC"
+              : "BOSS_TURN_TOO_LATE_CUTSCENE_SRC"
+          }
+          onClose={() => setCutscenePreview(null)}
+        />
+      )}
     </main>
   );
 }
