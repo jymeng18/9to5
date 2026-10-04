@@ -23,19 +23,41 @@ export const Route = createFileRoute("/boss-webcam-lab")({
 function BossWebcamLab() {
   const navigate = useNavigate();
   const [side, setSide] = useState<BossSide>("right");
-  const [run, setRun] = useState(0);
-  const [result, setResult] = useState("Camera starting…");
+  const [cameraRun, setCameraRun] = useState<number | null>(null);
+  const [result, setResult] = useState(
+    "Camera is off. Ending previews are ready.",
+  );
   const [cutscenePreview, setCutscenePreview] =
     useState<BossCutsceneOutcome | null>(null);
 
   const selectSide = (nextSide: BossSide) => {
     setSide(nextSide);
     setResult(`${nextSide === "right" ? "Right" : "Left"} preview starting…`);
-    setRun((current) => current + 1);
+    setCameraRun((current) => (current ?? 0) + 1);
   };
 
   return (
     <main className="boss-webcam-lab">
+      <section
+        className="xp-window boss-webcam-lab__ending-controls"
+        aria-labelledby="ending-preview-title"
+      >
+        <header className="xp-titlebar">
+          <div className="xp-title" id="ending-preview-title">
+            🎬 Boss sneak ending previews
+          </div>
+        </header>
+        <div>
+          <p>Play either configured cutscene without starting the webcam.</p>
+          <button type="button" onClick={() => setCutscenePreview("inTime")}>
+            ▶ Play Happy ending
+          </button>
+          <button type="button" onClick={() => setCutscenePreview("tooLate")}>
+            ▶ Play Sad ending
+          </button>
+        </div>
+      </section>
+
       <aside className="xp-window boss-webcam-lab__panel">
         <header className="xp-titlebar">
           <div className="xp-title">
@@ -66,17 +88,11 @@ function BossWebcamLab() {
             <button
               type="button"
               onClick={() => {
-                setResult("Preview restarting…");
-                setRun((current) => current + 1);
+                setResult("Camera preview starting…");
+                setCameraRun((current) => (current ?? 0) + 1);
               }}
             >
-              Restart camera
-            </button>
-            <button type="button" onClick={() => setCutscenePreview("inTime")}>
-              Preview Happy ending
-            </button>
-            <button type="button" onClick={() => setCutscenePreview("tooLate")}>
-              Preview Sad ending
+              Start / restart camera
             </button>
           </div>
           <p className="boss-webcam-lab__result" role="status">
@@ -106,14 +122,30 @@ function BossWebcamLab() {
         </div>
       </aside>
 
-      <div className="boss-webcam-lab__preview" key={`${side}-${run}`}>
-        <WebcamTurnWindow
-          countdownMs={60_000}
-          forcedBossSide={side}
-          onTurnDetected={() => setResult("In-time turn detected.")}
-          onTimedOut={() => setResult("The 60-second lab timer expired.")}
-          onClose={() => void navigate({ to: "/" })}
-        />
+      <div className="boss-webcam-lab__preview" key={`${side}-${cameraRun}`}>
+        {cameraRun === null ? (
+          <section className="xp-window boss-webcam-lab__camera-idle">
+            <header className="xp-titlebar">Webcam preview</header>
+            <p>The camera stays off until you start the tuning preview.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setResult("Camera preview starting…");
+                setCameraRun(1);
+              }}
+            >
+              Start camera preview
+            </button>
+          </section>
+        ) : (
+          <WebcamTurnWindow
+            countdownMs={60_000}
+            forcedBossSide={side}
+            onTurnDetected={() => setResult("In-time turn detected.")}
+            onTimedOut={() => setResult("The 60-second lab timer expired.")}
+            onClose={() => void navigate({ to: "/" })}
+          />
+        )}
       </div>
 
       {cutscenePreview && (
