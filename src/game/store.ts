@@ -190,7 +190,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (state.cutsceneKind === "wake") return { phase: "gameOver" };
     if (state.bossIndex === 2) return { phase: "victory" };
     const bossIndex = (state.bossIndex + 1) as 1 | 2;
-    return { phase: "playing", bossIndex, xp: 0, energy: BALANCE.bossStartEnergy, completed: [], openApps: [], minimizedApps: [], focusedApp: null, scrollSeconds: 0, totalSeconds: 0, idleSeconds: 0, activeQte: null, activeEventId: null, activeMessageText: null, activeSession: null, usedEventIds: [] };
+    return { phase: "playing", bossIndex, xp: 0, energy: BALANCE.bossStartEnergy, completed: [], openApps: [], minimizedApps: [], focusedApp: null, scrollSeconds: 0, totalSeconds: 0, idleSeconds: 0, activeQte: null, activeEventId: null, activeMessageText: null, activeSession: null, usedEventIds: [], managementNotices: 0 };
   }),
   restart: () => {
     replyTimers.forEach((timer) => window.clearTimeout(timer));
