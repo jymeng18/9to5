@@ -5,7 +5,6 @@ import {
   BOSS_TURN_TOO_LATE_CUTSCENE_SRC,
 } from "@/game/bossEvent";
 import {
-  armBossEventAudio,
   startBossEventFootsteps,
   stopBossEventFootsteps,
 } from "@/game/bossEventAudio";
@@ -71,7 +70,6 @@ function Desktop() {
   const dismissCaught = useGameStore((state) => state.dismissCaught);
   const bossEventStage = useGameStore((state) => state.bossEventStage);
   const bossCutsceneOutcome = useGameStore((state) => state.bossCutsceneOutcome);
-  const startBossEvent = useGameStore((state) => state.startBossEvent);
   const showBossPrompt = useGameStore((state) => state.showBossPrompt);
   const openBossWebcam = useGameStore((state) => state.openBossWebcam);
   const completeBossTurn = useGameStore((state) => state.completeBossTurn);
@@ -107,19 +105,6 @@ function Desktop() {
     <aside className="desktop-icons">{icons.map((item) => <button type="button" key={item.app} className="desktop-icon" onDoubleClick={() => openApp(item.app)} onClick={(event) => { if (event.detail === 1) focusApp(item.app); }}><span className={`desktop-glyph ${item.app}`}>{item.image ? <img src={item.image} alt="" width={32} height={32} /> : item.glyph}</span><span>{item.label}</span></button>)}</aside>
     <section className={`career-window ${xp === 100 ? "full" : ""}`}><header><div className="boss-avatar tiny"><img src={boss.photo} alt={boss.name} /></div><strong>Career Progress</strong></header><div className="career-body"><Progress label="XP" value={xp} tone="green" /><Progress label="Energy" value={energy} tone={energy < 25 ? "red" : "amber"} /><div className="meter-row strike-row"><span>Strikes</span><div className="strike-hearts" role="img" aria-label={`${managementNotices} of 3 strikes used`}>{[0, 1, 2].map((index) => <span key={index} className={`strike-heart${index < managementNotices ? " lost" : ""}`} aria-hidden="true">♥</span>)}</div><b>{managementNotices}/3</b></div><p>Reporting to: <strong>{boss.name}, {boss.title}</strong></p></div></section>
     <section className="priorities"><header>Today's Priorities</header><p>{boss.title}'s critical path</p><ul>{boss.missions.map((mission) => <li key={mission.id} className={completed.includes(mission.id) ? "done" : ""}><span>{completed.includes(mission.id) ? "☑" : "☐"}</span><button type="button" onClick={() => openApp(mission.app)}>{mission.label}</button></li>)}</ul><footer>{completed.length} of 5 complete</footer></section>
-    {bossIndex === 0 && bossEventStage === "idle" && (
-      <button
-        type="button"
-        className="boss-event-test-trigger"
-        onMouseDown={(event) => event.stopPropagation()}
-        onClick={() => {
-          armBossEventAudio();
-          startBossEvent();
-        }}
-      >
-        Test full boss sneak sequence
-      </button>
-    )}
     <TaskApps />
     <SleepyOverlay />
     <QteOverlay />

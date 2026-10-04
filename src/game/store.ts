@@ -51,6 +51,7 @@ interface GameState {
   teamsMessages: TeamsMessage[];
   teamsActiveDm: 0 | 1 | 2 | null;
   start: () => void;
+  startAtBoss: (bossIdx: 0 | 1 | 2) => void;
   openApp: (app: AppId) => void;
   focusApp: (app: AppId) => void;
   minimizeApp: (app: AppId) => void;
@@ -112,6 +113,13 @@ let replyTimers: number[] = [];
 export const useGameStore = create<GameState>((set, get) => ({
   ...initial,
   start: () => set({ phase: "playing" }),
+  startAtBoss: (bossIdx) => {
+    replyTimers.forEach((timer) => window.clearTimeout(timer));
+    replyTimers = [];
+    msgCounter = 0;
+    sessionCounter = 0;
+    set({ ...initial, phase: "playing", bossIndex: bossIdx });
+  },
   openApp: (app) => set((state) => ({
     openApps: state.openApps.includes(app) ? state.openApps : [...state.openApps, app],
     minimizedApps: state.minimizedApps.filter((item) => item !== app),

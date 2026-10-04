@@ -482,8 +482,5 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 /* Teams avatar */
 .teams-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:var(--primary-foreground);font-size:11px;font-weight:bold;flex-shrink:0;overflow:hidden}.teams-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* Temporary first-boss full-sequence trigger. */
-.boss-event-test-trigger{position:absolute;z-index:151;left:112px;bottom:44px;min-height:32px;padding:5px 12px;border:2px outset var(--primary-foreground);background:var(--energy-amber);color:var(--foreground);font-weight:bold;cursor:pointer}.boss-event-test-trigger:active{border-style:inset}
-
 /* Temporary ending previews in the BossCam lab. */
 .boss-webcam-lab__ending-controls{grid-column:1/-1;width:100%;align-self:end}.boss-webcam-lab__ending-controls>div{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px;background:var(--office-panel)}.boss-webcam-lab__ending-controls p{flex:1 1 280px;margin:0;font-size:13px;font-weight:bold}.boss-webcam-lab__ending-controls button,.boss-webcam-lab__camera-idle button{min-height:42px;padding:7px 16px;border:3px outset var(--primary-foreground);background:var(--xp-blue);color:var(--primary-foreground);font-weight:bold;cursor:pointer}.boss-webcam-lab__ending-controls button:last-child{background:var(--energy-red)}.boss-webcam-lab__ending-controls button:active,.boss-webcam-lab__camera-idle button:active{border-style:inset}.boss-webcam-lab__camera-idle{padding-bottom:16px;background:var(--office-panel);text-align:center}.boss-webcam-lab__camera-idle p{margin:18px 12px 12px}

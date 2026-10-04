@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BossCreepOverlay } from "@/components/game/BossCreepOverlay";
 import { BossCutscenePlayer } from "@/components/game/BossCutscenePlayer";
 import { BossWebcamPrompt } from "@/components/game/BossWebcamPrompt";
-import { Game } from "@/components/game/Game";
 import {
   BOSS_TURN_COUNTDOWN_MS,
   BOSS_TURN_IN_TIME_CUTSCENE_SRC,
@@ -117,37 +116,6 @@ describe("boss webcam event", () => {
 
     expect(useGameStore.getState().completed).toHaveLength(3);
     expect(useGameStore.getState().bossEventStage).toBe("idle");
-  });
-
-  it("offers a temporary full-sequence trigger only during the first boss", () => {
-    const play = vi
-      .spyOn(HTMLMediaElement.prototype, "play")
-      .mockResolvedValue(undefined);
-    const pause = vi
-      .spyOn(HTMLMediaElement.prototype, "pause")
-      .mockImplementation(() => undefined);
-    useGameStore.setState({ phase: "playing", bossIndex: 0 });
-    const firstBoss = render(createElement(Game));
-    const trigger = firstBoss.getByRole("button", {
-      name: "Test full boss sneak sequence",
-    });
-
-    fireEvent.click(trigger);
-
-    expect(useGameStore.getState().bossEventStage).toBe("creeping");
-    firstBoss.unmount();
-
-    useGameStore.getState().restart();
-    useGameStore.setState({ phase: "playing", bossIndex: 1 });
-    const secondBoss = render(createElement(Game));
-    expect(
-      secondBoss.queryByRole("button", {
-        name: "Test full boss sneak sequence",
-      }),
-    ).toBeNull();
-    secondBoss.unmount();
-    pause.mockRestore();
-    play.mockRestore();
   });
 
   it("selects the in-time cutscene after a detected turn", () => {
