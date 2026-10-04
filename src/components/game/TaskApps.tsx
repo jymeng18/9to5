@@ -90,18 +90,30 @@ function NotesApp({ task }: { task: MissionTask | undefined }) {
 
 function BreakRoom() {
   const slides = useMemo(() => [
-    { title: "Quarterly serenity", caption: "A loading bar reaches 99% and stops.", author: "@office_zen", likes: "12.4K", comments: "342", emoji: "📊" },
-    { title: "Lunch desk tour", caption: "One yogurt. Three status meetings.", author: "@desk_diaries", likes: "8.7K", comments: "156", emoji: "🍱" },
-    { title: "Inbox archaeology", caption: "Email threads older than the intern.", author: "@corporate_lore", likes: "31.2K", comments: "1.2K", emoji: "📧" },
-    { title: "Leadership quote", caption: "There is no I in unpaid overtime.", author: "@hustle_culture", likes: "45.8K", comments: "2.3K", emoji: "💼" },
-    { title: "Meeting recovery", caption: "That meeting could have been an email.", author: "@zoom_fatigue", likes: "67.1K", comments: "4.1K", emoji: "🎯" },
-    { title: "Coffee run protocol", caption: "Third cup before 10 AM. New personal best.", author: "@caffeine_coder", likes: "22.3K", comments: "890", emoji: "☕" },
+    { src: "/shorts/short_01.mp4", title: "Quarterly serenity", caption: "A loading bar reaches 99% and stops.", author: "@office_zen", likes: "12.4K", comments: "342" },
+    { src: "/shorts/short_02.mp4", title: "Lunch desk tour", caption: "One yogurt. Three status meetings.", author: "@desk_diaries", likes: "8.7K", comments: "156" },
+    { src: "/shorts/short_03.mp4", title: "Inbox archaeology", caption: "Email threads older than the intern.", author: "@corporate_lore", likes: "31.2K", comments: "1.2K" },
+    { src: "/shorts/short_04.mp4", title: "Coffee run protocol", caption: "Third cup before 10 AM. New personal best.", author: "@caffeine_coder", likes: "22.3K", comments: "890" },
   ], []);
   const [index, setIndex] = useState(0);
   const [liked, setLiked] = useState<Set<number>>(new Set());
   const [transitioning, setTransitioning] = useState(false);
   const wheelLocked = useRef(false);
   const wheelUnlockTimer = useRef<number | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // Play the current video when index changes, pause others
+  useEffect(() => {
+    videoRefs.current.forEach((v, i) => {
+      if (!v) return;
+      if (i === index) {
+        v.currentTime = 0;
+        v.play().catch(() => {/* autoplay blocked, user will interact */});
+      } else {
+        v.pause();
+      }
+    });
+  }, [index]);
 
   useEffect(() => () => {
     if (wheelUnlockTimer.current !== null) window.clearTimeout(wheelUnlockTimer.current);
@@ -143,18 +155,22 @@ function BreakRoom() {
       onWheel={handleWheel}
       onKeyDown={(event) => { if (event.repeat) return; if (event.key === "ArrowDown") navigate(1); if (event.key === "ArrowUp") navigate(-1); }}
     >
-      {/* Ambient background */}
-      <div className="reel-bg" data-slide={index}>
-        <div className="reel-bg-grain" />
-        <div className="reel-bg-vignette" />
-      </div>
+      {/* Video layers — all videos are mounted for instant transitions, only active one is visible */}
+      {slides.map((s, i) => (
+        <video
+          key={s.src}
+          ref={(el) => { videoRefs.current[i] = el; }}
+          className={`reel-video ${i === index ? "reel-video-active" : ""}`}
+          src={s.src}
+          loop
+          muted
+          playsInline
+          preload="auto"
+        />
+      ))}
 
-      {/* Floating ambient particles */}
-      <div className="reel-particles" aria-hidden="true">
-        {Array.from({ length: 12 }, (_, i) => (
-          <span key={i} className="reel-particle" style={{ left: `${8 + (i * 7.5) % 84}%`, animationDelay: `${i * 0.7}s`, animationDuration: `${6 + (i % 4) * 2}s` }} />
-        ))}
-      </div>
+      {/* Vignette overlay on top of video */}
+      <div className="reel-bg-vignette" />
 
       {/* Status bar */}
       <div className="reel-status-bar">
@@ -168,8 +184,6 @@ function BreakRoom() {
 
       {/* Main content area */}
       <div className={`reel-content ${transitioning ? "reel-transitioning" : ""}`}>
-        <div className="reel-emoji-backdrop" aria-hidden="true">{slide.emoji}</div>
-
         {/* Bottom overlay info */}
         <div className="reel-info">
           <div className="reel-author-row">
@@ -183,7 +197,7 @@ function BreakRoom() {
             <span className="reel-music-icon">♫</span>
             <span className="reel-music-text">Original Audio — {slide.author}</span>
             <div className="reel-disc">
-              <span className="reel-disc-inner">{slide.emoji}</span>
+              <span className="reel-disc-inner">🎵</span>
             </div>
           </div>
         </div>

@@ -155,11 +155,17 @@
     border-color: var(--color-border);
   }
 
+  html {
+    overflow: hidden;
+    height: 100%;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     margin: 0;
     overflow: hidden;
+    height: 100%;
     font-family: Tahoma, Verdana, sans-serif;
   }
 }
@@ -181,7 +187,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 .boss-avatar { display:grid; place-items:center; border:2px outset var(--primary-foreground); background:var(--office-panel); color:var(--xp-blue-dark); font-weight:bold; }.boss-avatar.tiny { width:19px;height:19px;font-size:8px }.boss-avatar.small{width:38px;height:38px;font-size:11px}.boss-avatar.giant{width:220px;height:220px;border-radius:50%;font-size:72px}.boss-avatar.call-avatar{width:110px;height:110px;border-radius:50%;font-size:32px;margin:25px auto 8px;animation:pulse-boss 1s infinite}
 .priorities { position:absolute; z-index:4; top:175px; right:28px; width:248px; padding:16px 18px 12px; background:var(--sticky); color:color-mix(in oklab,var(--foreground) 88%,var(--energy-amber)); box-shadow:3px 4px 10px color-mix(in oklab,var(--foreground) 35%,transparent); transform:rotate(1deg); }.priorities header { font-size:20px;font-weight:bold;border-bottom:1px solid color-mix(in oklab,var(--foreground) 28%,transparent);padding-bottom:6px }.priorities>p{font-size:11px;text-transform:uppercase}.priorities ul{list-style:none;padding:0;margin:13px 0}.priorities li{display:flex;align-items:flex-start;gap:5px;margin:9px 0}.priorities li button{border:0;background:transparent;text-align:left;padding:0;font-size:12px;cursor:pointer}.priorities li.done button{text-decoration:line-through;opacity:.6}.priorities footer{border-top:1px solid color-mix(in oklab,var(--foreground) 25%,transparent);padding-top:7px;font-size:11px}
 
-.xp-window { position:absolute; border:3px solid var(--xp-blue); border-radius:7px 7px 1px 1px; background:var(--office-panel); box-shadow:3px 5px 12px color-mix(in oklab,var(--foreground) 45%,transparent); overflow:hidden; }.xp-window[data-focused=false]{border-color:color-mix(in oklab,var(--xp-blue) 45%,var(--muted));}.xp-window[data-focused=false] .xp-titlebar{filter:saturate(.25);}.xp-titlebar{padding:0 3px;cursor:move}.xp-title{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:bold;text-shadow:1px 1px var(--xp-blue-dark)}.xp-window-actions{margin-left:auto;display:flex;gap:2px}.xp-window-actions button{width:22px;height:21px;padding:0;border:1px solid var(--primary-foreground);border-radius:3px;background:var(--xp-blue);color:var(--primary-foreground);font-weight:bold;line-height:16px}.xp-window-actions .xp-close{background:var(--energy-red);font-size:18px}.xp-menu{height:22px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--office-panel);font-size:11px}.xp-window-body{height:calc(100% - 49px);background:var(--background);overflow:auto;color:var(--foreground)}.xp-window-no-menu .xp-window-body{height:calc(100% - 27px)}
+.xp-window { position:absolute; border:3px solid var(--xp-blue); border-radius:7px 7px 1px 1px; background:var(--office-panel); box-shadow:3px 5px 12px color-mix(in oklab,var(--foreground) 45%,transparent); overflow:hidden; }.xp-window[data-focused=false]{border-color:color-mix(in oklab,var(--xp-blue) 45%,var(--muted));}.xp-window[data-focused=false] .xp-titlebar{filter:saturate(.25);}.xp-titlebar{padding:0 3px;cursor:move}.xp-title{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:bold;text-shadow:1px 1px var(--xp-blue-dark)}.xp-window-actions{margin-left:auto;display:flex;gap:2px}.xp-window-actions button{width:22px;height:21px;padding:0;border:1px solid var(--primary-foreground);border-radius:3px;background:var(--xp-blue);color:var(--primary-foreground);font-weight:bold;line-height:16px}.xp-window-actions .xp-close{background:var(--energy-red);font-size:18px}.xp-menu{height:22px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--office-panel);font-size:11px}.xp-window-body{height:calc(100% - 49px);background:var(--background);overflow:hidden;color:var(--foreground)}.xp-window-no-menu .xp-window-body{height:calc(100% - 27px)}
 .app-instruction{margin:8px;padding:7px;border:1px solid var(--energy-amber);background:color-mix(in oklab,var(--sticky) 55%,var(--background));font-size:12px;font-weight:bold}.files-app{height:100%;display:grid;grid-template-columns:150px 1fr}.files-app aside{display:flex;flex-direction:column;gap:8px;padding:15px 10px;background:color-mix(in oklab,var(--xp-blue) 12%,var(--background));color:var(--xp-blue-dark);font-size:11px}.files-app aside button{border:0;background:transparent;text-align:left;color:inherit;font-size:11px}.files-app main{padding:6px}.loose-file,.folder{display:inline-flex;flex-direction:column;align-items:center;gap:5px;width:100px;min-height:74px;border:1px solid transparent;background:transparent;font-size:25px}.loose-file span,.folder span{font-size:11px;overflow-wrap:anywhere}.loose-file.selected{border:1px dotted var(--foreground);background:color-mix(in oklab,var(--xp-blue) 22%,transparent)}.folder-row{display:flex;gap:14px;margin-top:28px}.folder:hover{background:color-mix(in oklab,var(--xp-blue) 14%,transparent)}.status-line{font-size:11px;border-top:1px solid var(--border);padding:4px;margin-top:auto}.sheet-toolbar{height:30px;display:flex;align-items:center;gap:14px;padding:0 8px;border-bottom:1px solid var(--border);font-size:11px}.sheet-toolbar span,.sheet-toolbar strong{padding:2px 16px 2px 4px;border:1px inset var(--border)}.sheet-toolbar button{margin-left:auto}.formula-bar{padding:4px 8px;border-bottom:1px solid var(--border);font-size:11px}.grid{display:grid;grid-template-columns:repeat(5,1fr);margin:8px;border:1px solid var(--border)}.grid>*{height:42px;min-width:0;border:1px solid var(--border);padding:5px;background:var(--background)}.grid .risk-row{background:color-mix(in oklab,var(--energy-red) 36%,var(--background))}.notes-app{display:flex;flex-direction:column;height:100%;padding:10px}.typing-target{font-size:12px;margin:0}.notes-app blockquote{margin:7px 0;padding:8px;border:1px solid var(--border);background:var(--muted);font-size:12px}.notes-app textarea{flex:1;resize:none;border:1px inset var(--border);padding:8px;font-family:"Courier New",monospace}.empty-app,.recycle-app{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}.empty-app>span{font-size:42px;color:var(--xp-green)}.empty-app p{font-size:12px}.recycle-app{font-size:42px}.recycle-app strong{font-size:14px}.recycle-app span{font-size:11px}
 /* ═══════════════════════════════════════════════════════════════════
    Break Room — Premium Reels Experience
@@ -189,7 +195,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 
 .break-app{height:100%;background:#000;position:relative;overflow:hidden;color:white;outline:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
 
-/* ── Animated gradient backgrounds ── */
+/* ── Video layers ── */
+.reel-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s ease;z-index:0;pointer-events:none}
+.reel-video-active{opacity:1;z-index:1}
+
 .reel-bg{position:absolute;inset:0;transition:background 0.6s cubic-bezier(.4,0,.2,1);background:linear-gradient(145deg,#1a0533 0%,#0d1b2a 30%,#1b2838 60%,#0a0f1a 100%)}
 .reel-bg[data-slide="0"]{background:linear-gradient(145deg,#1a0533 0%,#2d1b69 35%,#0d1b2a 70%,#0a0f1a 100%)}
 .reel-bg[data-slide="1"]{background:linear-gradient(150deg,#0a1628 0%,#1b4332 35%,#081c15 70%,#0a0f1a 100%)}
@@ -202,7 +211,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 .reel-bg-grain{position:absolute;inset:0;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px;pointer-events:none;mix-blend-mode:overlay}
 
 /* Cinematic vignette */
-.reel-bg-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,0.6) 100%)}
+.reel-bg-vignette{position:absolute;inset:0;pointer-events:none;z-index:2;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,0.6) 100%)}
 
 /* ── Floating ambient particles ── */
 .reel-particles{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
