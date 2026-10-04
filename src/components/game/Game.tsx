@@ -13,6 +13,7 @@ const icons: Array<{ app: AppId; label: string; image?: string; glyph?: string }
   { app: "notes", label: "Notepad", image: notepadIcon },
   { app: "break", label: "Break Room", glyph: "▶" },
   { app: "recycle", label: "Recycle Bin", glyph: "♻" },
+  { app: "teams", label: "Teams", glyph: "T" },
 ];
 
 export function Game() {
@@ -54,7 +55,24 @@ function Desktop() {
     <TaskApps />
     <SleepyOverlay />
     <QteOverlay />
-    {caughtMessage && <div className="caught-toast"><b>⚠ Management feedback</b><span>{caughtMessage}</span><button type="button" onClick={dismissCaught}>OK</button></div>}
+    {caughtMessage && (
+      <div className="qte-scrim dramatic-scrim">
+        <div className="caught-modal">
+          <div className="caught-modal-header">
+            <span className="warning-icon">⚠</span>
+            <h1>OFFICIAL REPRIMAND</h1>
+          </div>
+          <div className="caught-modal-body">
+            <p className="caught-sentence">MANAGEMENT HAS LOGGED AN INFRACTION</p>
+            <p className="caught-message">"{caughtMessage}"</p>
+            <p className="caught-penalty">ENERGY PENALTY APPLIED.</p>
+          </div>
+          <div className="caught-modal-footer">
+            <button type="button" onClick={dismissCaught}>ACKNOWLEDGE & RETURN TO WORK</button>
+          </div>
+        </div>
+      </div>
+    )}
     {startOpen && <section className="start-menu" onMouseDown={(event) => event.stopPropagation()}><header><span className="employee-photo mini">👔</span><strong>New Hire</strong></header><div className="start-columns"><div>{icons.slice(0, 4).map((item) => <button type="button" key={item.app} onClick={() => { openApp(item.app); setStartOpen(false); }}><span>{item.glyph ?? "▣"}</span><b>{item.label}</b></button>)}</div><aside><button type="button">My Performance</button><button type="button">Recent Deliverables</button><button type="button">Squads</button><hr /><button type="button">Corporate Help</button><button type="button">Search</button></aside></div><footer>🔒 Log Off&nbsp;&nbsp;&nbsp; ⏻ Turn Off</footer></section>}
     <footer className="taskbar" onMouseDown={(event) => event.stopPropagation()}><button type="button" className="start-button" onClick={() => setStartOpen((value) => !value)}><span>◫</span> start</button><div className="taskbar-apps">{openApps.map((app) => <button type="button" key={app} className={focusedApp === app && !minimizedApps.includes(app) ? "active" : ""} onClick={() => focusApp(app)}>{icons.find((item) => item.app === app)?.glyph ?? "▣"} {icons.find((item) => item.app === app)?.label}</button>)}</div><div className="tray"><button type="button" aria-label={muted ? "Unmute" : "Mute"} onClick={toggleMute}>{muted ? "🔇" : "🔊"}</button><span title={`Energy ${Math.round(energy)} percent`}>🔋 {Math.round(energy)}%</span><time>{hour > 12 ? hour - 12 : hour}:00 {hour >= 12 ? "PM" : "AM"}</time></div></footer>
     <PhaseOverlay />

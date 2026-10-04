@@ -1,9 +1,9 @@
 export type BossId = "manager" | "seniorManager" | "vp";
-export type AppId = "files" | "sheets" | "notes" | "break" | "recycle";
+export type AppId = "files" | "sheets" | "notes" | "break" | "recycle" | "teams";
 
 export interface MissionTask {
   id: string;
-  app: Exclude<AppId, "break" | "recycle">;
+  app: Exclude<AppId, "break" | "recycle" | "teams">;
   label: string;
   instruction: string;
 }
@@ -34,8 +34,8 @@ export const BOSSES: Boss[] = [
     name: "Gary",
     title: "Manager",
     initials: "GM",
-    messageEvery: 12,
-    reactionWindow: 5,
+    messageEvery: 15,
+    reactionWindow: 9,
     messages: [
       "Quick sync? Need to leverage your bandwidth ASAP.",
       "Are we aligned on the north star here?",
@@ -54,9 +54,9 @@ export const BOSSES: Boss[] = [
     name: "Denise",
     title: "Senior Manager",
     initials: "DS",
-    messageEvery: 10,
+    messageEvery: 12,
     callEvery: 25,
-    reactionWindow: 4,
+    reactionWindow: 8,
     messages: [
       "Let's operationalize this learning immediately.",
       "I need a pre-read for the pre-read by noon.",
@@ -75,10 +75,10 @@ export const BOSSES: Boss[] = [
     name: "Richard",
     title: "Vice President",
     initials: "RV",
-    messageEvery: 8,
+    messageEvery: 10,
     callEvery: 20,
     sneakEvery: 30,
-    reactionWindow: 3,
+    reactionWindow: 7,
     messages: [
       "Visibility is accountability. Where is the deck?",
       "This needs executive-ready thinking, not activity.",

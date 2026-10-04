@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getBoss, type AppId, type MissionTask } from "@/game/bosses";
 import { useGameStore } from "@/game/store";
 import { XpWindow } from "./XpWindow";
+import { TeamsApp } from "./TeamsApp";
 
 const APP_META: Record<AppId, { title: string; icon: string }> = {
   files: { title: "Documents", icon: "📁" },
@@ -9,6 +10,7 @@ const APP_META: Record<AppId, { title: string; icon: string }> = {
   notes: { title: "Untitled - Notepad", icon: "📝" },
   break: { title: "Break Room", icon: "▶" },
   recycle: { title: "Recycle Bin", icon: "♻" },
+  teams: { title: "Microsoft Teams", icon: "T" },
 };
 
 function currentTask(app: MissionTask["app"], bossIndex: 0 | 1 | 2, completed: string[]) {
@@ -60,8 +62,30 @@ function NotesApp({ task }: { task: MissionTask | undefined }) {
   const [value, setValue] = useState("");
   useEffect(() => setValue(""), [task?.id]);
   if (!task) return <EmptyApp />;
-  const correct = [...value].filter((char, index) => char === target[index]).length;
-  return <div className="notes-app"><p className="typing-target">Please retype exactly:</p><blockquote>{target}</blockquote><textarea autoFocus value={value} onChange={(event) => { const next = event.target.value; setValue(next); if (next === target) complete(task.id); }} spellCheck={false} /><div className="status-line">{correct} / {target.length} correct characters</div></div>;
+  // Bug fix: only count as "correct" up to target.length — extra chars don't count
+  const trimmed = value.slice(0, target.length);
+  const correct = [...trimmed].filter((char, index) => char === target[index]).length;
+  const isComplete = value === target;
+  return (
+    <div className="notes-app">
+      <p className="typing-target">Please retype exactly:</p>
+      <blockquote>{target}</blockquote>
+      <textarea
+        autoFocus
+        value={value}
+        onChange={(event) => {
+          const next = event.target.value;
+          setValue(next);
+          // Only complete when the string is an exact match (length + content)
+          if (next === target) complete(task.id);
+        }}
+        spellCheck={false}
+      />
+      <div className={`status-line${isComplete ? " notes-complete" : ""}`}>
+        {isComplete ? "✓ Complete!" : `${correct} / ${target.length} correct characters`}
+      </div>
+    </div>
+  );
 }
 
 function BreakRoom() {
@@ -72,11 +96,64 @@ function BreakRoom() {
     ["Leadership quote", "There is no I in unpaid overtime."],
   ], []);
   const [index, setIndex] = useState(0);
-  return <div className="break-app" tabIndex={0} onWheel={(event) => setIndex((index + (event.deltaY > 0 ? 1 : slides.length - 1)) % slides.length)} onKeyDown={(event) => { if (event.key === "ArrowDown") setIndex((index + 1) % slides.length); if (event.key === "ArrowUp") setIndex((index + slides.length - 1) % slides.length); }}>
-    <div className="phone-video video-variant" data-slide={index}><div className="video-copy"><small>BREAK ROOM SHORTS</small><strong>{slides[index]?.[0] ?? "Quarterly serenity"}</strong><span>{slides[index]?.[1] ?? "A loading bar reaches 99% and stops."}</span></div><div className="video-controls"><button type="button" aria-label="Previous short" onClick={() => setIndex((index + slides.length - 1) % slides.length)}>▲</button><button type="button" aria-label="Next short" onClick={() => setIndex((index + 1) % slides.length)}>▼</button></div></div>
-    <div className="energy-float">+3 energy/sec</div>
-    <p>Scroll discreetly. Management visibility may vary.</p>
-  </div>;
+
+  const next = () => setIndex((i) => (i + 1) % slides.length);
+  const prev = () => setIndex((i) => (i + slides.length - 1) % slides.length);
+
+  return (
+    <div
+      className="break-app"
+      tabIndex={0}
+      onWheel={(event) => {
+        if (event.deltaY > 0) next();
+        else prev();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowDown") next();
+        if (event.key === "ArrowUp") prev();
+      }}
+    >
+      <div className="phone-video video-variant" data-slide={index}>
+        <div className="phone-status-bar">
+          <span>9:41</span>
+          <div>
+            <span>📶</span> <span>🔋</span>
+          </div>
+        </div>
+        
+        <div className="video-copy">
+          <strong>{slides[index]?.[0]}</strong>
+          <span>{slides[index]?.[1]}</span>
+        </div>
+        
+        <div className="video-controls">
+          <button type="button" onClick={prev} aria-label="Previous">▲</button>
+          <div className="video-action-btn">
+            <span className="icon">🤍</span>
+            <span className="count">12K</span>
+          </div>
+          <div className="video-action-btn">
+            <span className="icon">💬</span>
+            <span className="count">45</span>
+          </div>
+          <div className="video-action-btn">
+            <span className="icon">↗</span>
+            <span className="count">Share</span>
+          </div>
+          <button type="button" onClick={next} aria-label="Next">▼</button>
+        </div>
+
+        <div className="phone-bottom-nav">
+          <span>🏠</span>
+          <span>🔍</span>
+          <span className="add-btn">➕</span>
+          <span>📥</span>
+          <span>👤</span>
+        </div>
+      </div>
+      <div className="energy-float">+3 energy/sec</div>
+    </div>
+  );
 }
 
 function EmptyApp() { return <div className="empty-app"><span>✓</span><strong>All assigned work is complete.</strong><p>Please wait quietly for additional responsibilities.</p></div>; }
@@ -91,7 +168,8 @@ export function TaskApps() {
     if (app === "files") return <XpWindow key={app} {...common}><FileApp task={currentTask("files", bossIndex, completed)} /></XpWindow>;
     if (app === "sheets") return <XpWindow key={app} {...common} width={650}><SheetsApp task={currentTask("sheets", bossIndex, completed)} /></XpWindow>;
     if (app === "notes") return <XpWindow key={app} {...common}><NotesApp task={currentTask("notes", bossIndex, completed)} /></XpWindow>;
-    if (app === "break") return <XpWindow key={app} {...common} width={480} height={520}><BreakRoom /></XpWindow>;
+    if (app === "break") return <XpWindow key={app} {...common} width={400} height={700}><BreakRoom /></XpWindow>;
+    if (app === "teams") return <XpWindow key={app} {...common} width={760} height={520}><TeamsApp /></XpWindow>;
     return <XpWindow key={app} {...common} width={390} height={230}><div className="recycle-app">🗑️<strong>Your dignity</strong><span>0 bytes</span></div></XpWindow>;
   })}</>;
 }

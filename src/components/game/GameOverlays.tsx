@@ -9,6 +9,7 @@ export function QteOverlay() {
   const advance = useGameStore((state) => state.advanceQte);
   const fail = useGameStore((state) => state.failQte);
   const minimize = useGameStore((state) => state.minimizeApp);
+  const openTeamsDm = useGameStore((state) => state.openTeamsDm);
   const [left, setLeft] = useState(getBoss(bossIndex).reactionWindow);
   const boss = getBoss(bossIndex);
 
@@ -26,9 +27,34 @@ export function QteOverlay() {
     window.addEventListener("keydown", escape);
     return () => window.removeEventListener("keydown", escape);
   }, [activeQte, advance, minimize]);
+
   if (!activeQte) return null;
-  if (activeQte === "message") return <aside className="squads-toast"><div className="squads-head"><span>S</span><strong>Squads</strong><b>{left}s</b></div><div className="boss-avatar small">{boss.initials}</div><div><strong>{boss.name}</strong><p>{boss.messages[Math.floor(Date.now() / 1000) % boss.messages.length]}</p><button type="button" onClick={advance}>👍 Synergy!</button></div></aside>;
-  if (activeQte === "call") return <div className="qte-scrim"><section className="call-dialog"><div className="squads-head"><span>S</span><strong>Squads — Incoming call</strong><b>{left}s</b></div><div className="boss-avatar call-avatar">{boss.initials}</div><h2>{boss.name}</h2><p>{qteStep === "incoming" ? "wants to connect" : "You're on mute… actually, never mind."}</p>{qteStep === "incoming" ? <div className="call-actions"><button type="button" className="answer" onClick={advance}>☎ Answer</button><button type="button" className="decline" onClick={fail}>✕ Decline</button></div> : <button type="button" className="unmute" onClick={advance}>🎙 Unmute</button>}</section></div>;
+
+  if (activeQte === "message") {
+    const msgText = boss.messages[Math.floor(Date.now() / 1000) % boss.messages.length];
+    return (
+      <aside className="squads-toast">
+        <div className="squads-head">
+          <span>T</span>
+          <strong>Microsoft Teams</strong>
+          <b>{left}s</b>
+        </div>
+        <div className="boss-avatar small">{boss.initials}</div>
+        <div>
+          <strong>{boss.name}</strong>
+          <p>{msgText}</p>
+          <div className="squads-toast-actions">
+            <button type="button" onClick={() => openTeamsDm(bossIndex)}>
+              💬 Open Teams to Reply
+            </button>
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
+  if (activeQte === "call") return <div className="qte-scrim"><section className="call-dialog"><div className="squads-head"><span>T</span><strong>Microsoft Teams — Incoming call</strong><b>{left}s</b></div><div className="boss-avatar call-avatar">{boss.initials}</div><h2>{boss.name}</h2><p>{qteStep === "incoming" ? "wants to connect" : "You're on mute… actually, never mind."}</p>{qteStep === "incoming" ? <div className="call-actions"><button type="button" className="answer" onClick={advance}>☎ Answer</button><button type="button" className="decline" onClick={fail}>✕ Decline</button></div> : <button type="button" className="unmute" onClick={advance}>🎙 Unmute</button>}</section></div>;
+
   return <div className="sneak-overlay"><div className="reflection" data-side={bossIndex % 2 ? "left" : "right"}><div className="boss-avatar reflection-face">{boss.initials}</div><strong>{boss.name.toUpperCase()}</strong></div><div className="sneak-warning"><b>{left}s</b><span>PRESS ESC — MINIMIZE BREAK ROOM</span></div><button type="button" onClick={() => { minimize("break"); advance(); }}>Minimize now</button></div>;
 }
 
