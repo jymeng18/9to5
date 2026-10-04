@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getBoss } from "@/game/bosses";
 import { useGameStore } from "@/game/store";
 
@@ -85,5 +85,95 @@ export function PhaseOverlay() {
   if (phase === "cutscene" && cutsceneKind === "slap") return <div className="cutscene slap-cutscene"><video className="cutscene-video" src={boss.cutscene} autoPlay playsInline muted={muted} onEnded={finishCutscene} /><button type="button" onClick={finishCutscene}>Continue promotion ▶▶</button></div>;
   if (phase === "cutscene") return <div className={`cutscene ${cutsceneKind}`}><div className="cutscene-boss"><div className="boss-avatar giant"><img src={boss.photo} alt={boss.name} /></div><span>{boss.name}<br />{boss.title}</span></div><div className="comic-burst">WAKE UP!</div><button type="button" onClick={finishCutscene}>Continue ▶▶</button></div>;
   if (phase === "gameOver") return <div className="bsod" role="button" tabIndex={0} onClick={restart} onKeyDown={restart}><div><h1>9to5</h1><p>A fatal error has occurred: YOU ARE FIRED.</p><p>Your energy reached zero while performing an essential business function. Unsaved dignity has been lost.</p><p>Press any key to restart your career _</p></div></div>;
-  return <div className="victory"><section className="gold-window"><header>Executive Promotion Wizard</header><div className="ceo-seal">CEO</div><h1>You are now CEO.</h1><p>It looks like you've fully assimilated.</p><small>Congratulations. The cycle is now yours to perpetuate.</small><button type="button" onClick={restart}>Play again</button></section></div>;
+  return <VictoryScreen onRestart={restart} />;
+}
+
+function VictoryScreen({ onRestart }: { onRestart: () => void }) {
+  const [stage, setStage] = useState(0);
+
+  useEffect(() => {
+    // Staged reveal: each stage fades in a new section
+    const timers = [
+      setTimeout(() => setStage(1), 800),   // title line
+      setTimeout(() => setStage(2), 2200),   // message block
+      setTimeout(() => setStage(3), 4000),   // status details
+      setTimeout(() => setStage(4), 5500),   // clippy + restart
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    if (stage >= 4) onRestart();
+  }, [stage, onRestart]);
+
+  useEffect(() => {
+    if (stage < 4) return;
+    const handler = (e: KeyboardEvent) => {
+      e.preventDefault();
+      onRestart();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [stage, onRestart]);
+
+  return (
+    <div className="victory-shutdown" onClick={handleRestart}>
+
+      {/* Scanline overlay for CRT feel */}
+      <div className="victory-scanlines" aria-hidden="true" />
+
+      <div className="victory-shutdown-content">
+
+        {/* Stage 0: always visible, the "Windows" header */}
+        <div className="victory-header">
+          <h1 className="victory-os-title">9to5<sup>™</sup></h1>
+        </div>
+
+        {/* Stage 1: main announcement */}
+        <div className={`victory-block${stage >= 1 ? " visible" : ""}`}>
+          <p className="victory-announce">
+            This workstation has been decommissioned.
+          </p>
+        </div>
+
+        {/* Stage 2: reason and details */}
+        <div className={`victory-block${stage >= 2 ? " visible" : ""}`}>
+          <p className="victory-detail">
+            EXECUTIVE_PROMOTION_COMPLETE (0x00000CEO)
+          </p>
+          <p className="victory-detail">
+            The current user has been promoted to <strong>Chief Executive Officer</strong>.
+            All workstation privileges have been revoked. You no longer need
+            a computer — you have people for that now.
+          </p>
+        </div>
+
+        {/* Stage 3: system status */}
+        <div className={`victory-block${stage >= 3 ? " visible" : ""}`}>
+          <p className="victory-detail">
+            STATUS: All pending deliverables have been reassigned to your
+            former colleagues. Your email has been forwarded to Legal.
+          </p>
+          <p className="victory-ceo-badge">
+            ★ C · E · O ★
+          </p>
+        </div>
+
+        {/* Stage 4: clippy-style message + restart */}
+        <div className={`victory-block victory-final${stage >= 4 ? " visible" : ""}`}>
+          <div className="victory-clippy">
+            <span className="victory-clippy-icon" aria-hidden="true">📎</span>
+            <p>
+              It looks like you've <strong>fully assimilated</strong>.
+              <br />
+              The cycle is now yours to perpetuate.
+            </p>
+          </div>
+          <p className="victory-restart">
+            Press any key to start a new career _
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
