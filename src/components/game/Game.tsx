@@ -41,6 +41,7 @@ function Desktop() {
   const muted = useGameStore((state) => state.muted);
   const toggleMute = useGameStore((state) => state.toggleMute);
   const caughtMessage = useGameStore((state) => state.caughtMessage);
+  const managementNotices = useGameStore((state) => state.managementNotices);
   const dismissCaught = useGameStore((state) => state.dismissCaught);
   const [startOpen, setStartOpen] = useState(false);
   const boss = getBoss(bossIndex);
@@ -56,21 +57,24 @@ function Desktop() {
     <SleepyOverlay />
     <QteOverlay />
     {caughtMessage && (
-      <div className="qte-scrim dramatic-scrim">
-        <div className="caught-modal">
-          <div className="caught-modal-header">
-            <span className="warning-icon">⚠</span>
-            <h1>OFFICIAL REPRIMAND</h1>
-          </div>
+      <div className="qte-scrim dramatic-scrim" role="presentation">
+        <section className="caught-modal" role="alertdialog" aria-modal="true" aria-labelledby="caught-modal-title" aria-describedby="caught-modal-description">
+          <header className="caught-modal-titlebar">
+            <span className="caught-title-icon">9to5</span>
+            <strong id="caught-modal-title">Management Notice</strong>
+            <button type="button" aria-label="Acknowledge management notice" onClick={dismissCaught}>×</button>
+          </header>
           <div className="caught-modal-body">
-            <p className="caught-sentence">MANAGEMENT HAS LOGGED AN INFRACTION</p>
-            <p className="caught-message">"{caughtMessage}"</p>
-            <p className="caught-penalty">ENERGY PENALTY APPLIED.</p>
+            <p className="caught-sentence">Your response to a Teams message was not received.</p>
+            <p id="caught-modal-description" className="caught-message">"{caughtMessage}"</p>
+            <p className="caught-record">Management notice {managementNotices} of 3</p>
+            <p className="caught-penalty">{managementNotices >= 3 ? "Three notices recorded. Your employment is terminated." : `${3 - managementNotices} warning${managementNotices === 2 ? "" : "s"} remaining before termination.`}</p>
           </div>
           <div className="caught-modal-footer">
-            <button type="button" onClick={dismissCaught}>ACKNOWLEDGE & RETURN TO WORK</button>
+            <span>Management has recorded this notice.</span>
+            <button type="button" onClick={dismissCaught}>OK</button>
           </div>
-        </div>
+        </section>
       </div>
     )}
     {startOpen && <section className="start-menu" onMouseDown={(event) => event.stopPropagation()}><header><span className="employee-photo mini">👔</span><strong>New Hire</strong></header><div className="start-columns"><div>{icons.slice(0, 4).map((item) => <button type="button" key={item.app} onClick={() => { openApp(item.app); setStartOpen(false); }}><span>{item.glyph ?? "▣"}</span><b>{item.label}</b></button>)}</div><aside><button type="button">My Performance</button><button type="button">Recent Deliverables</button><button type="button">Squads</button><hr /><button type="button">Corporate Help</button><button type="button">Search</button></aside></div><footer>🔒 Log Off&nbsp;&nbsp;&nbsp; ⏻ Turn Off</footer></section>}

@@ -317,106 +317,69 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 .squads-toast{position:absolute;z-index:150;right:16px;bottom:48px;width:420px;display:grid;grid-template-columns:55px 1fr;gap:12px;padding:12px;border:3px solid var(--squads);background:var(--background);box-shadow:4px 6px 16px color-mix(in oklab,var(--foreground) 50%,transparent);animation:slide-in-right .25s ease-out}.squads-head{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:-12px -12px 6px;padding:8px 10px;background:var(--squads);color:var(--primary-foreground)}.squads-head span{display:grid;place-items:center;width:24px;height:24px;background:color-mix(in oklab,var(--squads) 65%,var(--primary-foreground));font-weight:bold}.squads-head b{margin-left:auto}.squads-toast p{font-size:14px;line-height:1.4;margin:8px 0}.squads-toast button{min-height:36px;font-size:13px;border:2px outset var(--border);background:var(--office-panel)}.qte-scrim{position:absolute;z-index:145;inset:0;display:grid;place-items:center;background:color-mix(in oklab,var(--foreground) 30%,transparent)}.call-dialog{width:360px;min-height:385px;border:3px solid var(--squads);background:var(--office-panel);text-align:center}.call-dialog h2{margin:4px}.call-actions{display:flex;justify-content:center;gap:15px}.call-dialog button{min-width:110px;min-height:40px;border:2px outset var(--border);color:var(--primary-foreground);font-weight:bold}.answer,.unmute{background:var(--xp-green)}.decline{background:var(--energy-red)}.sneak-overlay{position:absolute;z-index:146;inset:0;background:linear-gradient(110deg,color-mix(in oklab,var(--xp-blue-dark) 20%,transparent),transparent 40%,color-mix(in oklab,var(--primary-foreground) 12%,transparent));animation:reflection-glare 3s linear}.reflection{position:absolute;top:14%;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--primary-foreground);opacity:.55;filter:blur(2px);animation:sneak-in 4s ease-in}.reflection[data-side=right]{right:8%}.reflection[data-side=left]{left:8%}.reflection-face{width:240px;height:290px;border-radius:45% 45% 12% 12%;font-size:70px;background:var(--xp-blue-dark);color:var(--primary-foreground)}.sneak-warning{position:absolute;left:50%;bottom:80px;transform:translateX(-50%);padding:10px 18px;background:var(--energy-red);color:var(--primary-foreground);border:3px outset var(--primary-foreground)}.sneak-warning b{margin-right:12px}.sneak-overlay>button{position:absolute;left:50%;bottom:35px;transform:translateX(-50%);min-height:30px}.sleepy-overlay{position:absolute;z-index:120;inset:0;pointer-events:none;backdrop-filter:blur(2px) saturate(.7);animation:sleepy-pulse 3s infinite}.sleepy-overlay[data-level=heavy]{backdrop-filter:blur(3px) saturate(.55)}.sleepy-overlay[data-level=critical]{backdrop-filter:blur(5px) saturate(.35)}.eyelid{position:absolute;left:0;right:0;height:22%;background:linear-gradient(var(--foreground),transparent)}.eyelid.top{top:0}.eyelid.bottom{bottom:0;transform:rotate(180deg)}.sleepy-overlay[data-level=critical] .eyelid{height:45%}.caught-toast{position:absolute;z-index:160;top:90px;right:20px;display:flex;flex-direction:column;gap:7px;width:300px;padding:10px;border:3px solid var(--energy-red);background:var(--office-panel);font-size:12px}.caught-toast button{align-self:flex-end;width:70px}
 .xp-dialog{width:370px;border:3px solid var(--xp-blue);background:var(--office-panel);box-shadow:3px 5px 12px color-mix(in oklab,var(--foreground) 45%,transparent)}.xp-dialog>header{padding:5px 8px;background:var(--xp-blue);color:var(--primary-foreground);font-weight:bold}.xp-dialog>div{display:flex;align-items:center;gap:14px;padding:22px}.dialog-icon{font-size:35px}.xp-dialog footer{text-align:right;padding:8px;border-top:1px solid var(--border)}.xp-dialog button{min-width:85px;min-height:28px}.cutscene{position:absolute;z-index:250;inset:0;display:flex;align-items:center;justify-content:space-around;background:var(--foreground);color:var(--primary-foreground);animation:cutscene-in .45s ease-out}.cutscene-boss{text-align:center}.cutscene-boss span{display:block;margin-top:15px;font-size:19px}.comic-burst{font-family:Impact,Haettenschweiler,sans-serif;font-size:clamp(80px,14vw,190px);transform:rotate(-8deg);color:var(--energy-amber);text-shadow:6px 6px var(--energy-red);animation:slap-burst .55s cubic-bezier(.2,1.8,.4,1)}.cutscene.wake .comic-burst{color:var(--primary-foreground)}.cutscene>button{position:absolute;right:25px;bottom:25px;min-height:32px}.bsod{position:absolute;z-index:260;inset:0;display:grid;place-items:center;background:var(--bsod);color:var(--primary-foreground);font-family:"Courier New",monospace}.bsod>div{max-width:750px}.bsod h1{display:inline;padding:0 8px;background:var(--office-panel);color:var(--bsod);font-size:18px}.bsod p{font-size:17px;line-height:1.6}.victory{position:absolute;z-index:260;inset:0;display:grid;place-items:center;background:color-mix(in oklab,var(--foreground) 86%,var(--energy-amber))}.gold-window{width:520px;border:4px ridge var(--energy-amber);background:var(--office-panel);text-align:center}.gold-window header{padding:7px;background:var(--energy-amber);font-weight:bold}.ceo-seal{display:grid;place-items:center;width:130px;height:130px;margin:26px auto 10px;border:8px double var(--energy-amber);border-radius:50%;font-size:39px;font-weight:bold}.gold-window h1{font-size:34px}.gold-window p{font-size:18px}.gold-window small{display:block;margin:20px}.gold-window button{margin:10px 0 25px;min-width:110px;min-height:32px}.narrow-warning{display:none}
 @keyframes career-shake{0%,100%{transform:translateX(-50%) rotate(-1deg)}50%{transform:translateX(calc(-50% + 4px)) rotate(1deg)}}@keyframes pulse-boss{50%{transform:scale(1.05)}}@keyframes energy-pop{50%{transform:translateY(-4px)}}@keyframes sleepy-pulse{50%{background:color-mix(in oklab,var(--foreground) 10%,transparent)}}@keyframes sneak-in{from{opacity:.08;filter:blur(8px);transform:scale(.85)}to{opacity:.55;filter:blur(2px);transform:scale(1.05)}}@keyframes reflection-glare{from{background-position:-100vw}to{background-position:100vw}}@keyframes cutscene-in{from{opacity:0}to{opacity:1}}@keyframes slap-burst{from{transform:scale(.1) rotate(-20deg)}to{transform:scale(1) rotate(-8deg)}}
-/* Dramatic caught warning modal */
+/* XP-styled management notice shown after a missed Teams message. */
 .dramatic-scrim {
-  background: color-mix(in oklab, var(--energy-red) 40%, transparent);
-  animation: flash-red 0.5s ease-out;
+  background: color-mix(in oklab, var(--xp-blue-dark) 48%, transparent);
+  animation: warning-scrim-in .16s ease-out;
   z-index: 200;
 }
 
-@keyframes flash-red {
-  0% { background: var(--energy-red); }
-  100% { background: color-mix(in oklab, var(--energy-red) 40%, transparent); }
-}
-
 .caught-modal {
-  width: 500px;
-  border: 6px solid var(--energy-red);
+  width: min(430px, calc(100vw - 34px));
+  border: 3px solid var(--xp-blue);
   background: var(--background);
-  box-shadow: 0 10px 30px color-mix(in oklab, var(--energy-red) 60%, transparent);
-  text-align: center;
-  animation: slam-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 3px 5px 10px color-mix(in oklab, var(--foreground) 45%, transparent);
+  animation: slam-down .22s ease-out;
 }
 
-@keyframes slam-down {
-  0% { transform: scale(1.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.caught-modal-header {
-  background: var(--energy-red);
-  color: var(--primary-foreground);
-  padding: 15px;
+.caught-modal-titlebar {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
+  min-height: 28px;
+  padding: 0 4px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--xp-blue) 72%, var(--primary-foreground)), var(--xp-blue) 50%, var(--xp-blue-dark));
+  color: var(--primary-foreground);
+  font-size: 12px;
+  text-shadow: 1px 1px var(--xp-blue-dark);
 }
 
-.warning-icon {
-  font-size: 48px;
-  line-height: 1;
-}
-
-.caught-modal-header h1 {
-  margin: 0;
-  font-size: 28px;
-  letter-spacing: 2px;
-}
-
-.caught-modal-body {
-  padding: 30px 20px;
-  background: repeating-linear-gradient(
-    45deg,
-    color-mix(in oklab, var(--energy-red) 5%, transparent),
-    color-mix(in oklab, var(--energy-red) 5%, transparent) 10px,
-    transparent 10px,
-    transparent 20px
-  );
-}
-
-.caught-sentence {
-  font-weight: 900;
-  font-size: 18px;
-  color: var(--energy-red);
-  margin-bottom: 15px;
-}
-
-.caught-message {
-  font-size: 22px;
-  font-style: italic;
-  color: var(--foreground);
-  margin-bottom: 20px;
-}
-
-.caught-penalty {
+.caught-title-icon {
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  background: var(--xp-blue-dark);
+  border: 1px outset var(--primary-foreground);
+  font-size: 8px;
   font-weight: bold;
-  font-size: 14px;
-  color: var(--muted-foreground);
 }
 
-.caught-modal-footer {
-  padding: 15px;
-  background: var(--office-panel);
-  border-top: 2px solid var(--border);
-}
-
-.caught-modal-footer button {
-  width: 100%;
-  padding: 12px;
+.caught-modal-titlebar button {
+  width: 22px;
+  height: 21px;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid var(--primary-foreground);
+  border-radius: 3px;
   background: var(--energy-red);
   color: var(--primary-foreground);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: bold;
-  border: none;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  line-height: 16px;
 }
 
-.caught-modal-footer button:hover {
-  background: color-mix(in oklab, var(--energy-red) 80%, black);
-}
+.caught-modal-body { padding: 22px 24px 18px; text-align: left; }
+.caught-sentence { margin: 0 0 18px; color: var(--foreground); font-size: 13px; }
+.caught-message { margin: 0 0 18px; padding-left: 12px; border-left: 2px solid var(--energy-red); color: var(--foreground); font-size: 15px; font-style: italic; line-height: 1.4; }
+.caught-record { margin: 0 0 8px; color: var(--muted-foreground); font-family: "Courier New", monospace; font-size: 11px; }
+.caught-penalty { margin: 0; color: var(--energy-red); font-size: 11px; font-weight: bold; }
+.caught-modal-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-top: 2px solid var(--border); background: var(--office-panel); color: var(--muted-foreground); font-size: 10px; }
+.caught-modal-footer button { min-width: 86px; min-height: 28px; padding: 3px 12px; border: 2px outset var(--border); background: var(--xp-blue); color: var(--primary-foreground); cursor: pointer; font-size: 12px; font-weight: bold; }
+.caught-modal-footer button:hover { background: var(--xp-blue-dark); }
+
+@keyframes warning-scrim-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slam-down { from { transform: translateY(-80px) scale(.8); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
 
 /* Teams app player messages */
 .teams-msg.player {
@@ -486,4 +449,3 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 
 /* Teams avatar */
 .teams-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:var(--primary-foreground);font-size:11px;font-weight:bold;flex-shrink:0}
-

@@ -27,6 +27,7 @@ interface GameState {
   activeQte: QteType;
   qteStep: "incoming" | "unmute";
   caughtMessage: string | null;
+  managementNotices: number;
   muted: boolean;
   cutsceneKind: "slap" | "wake";
   teamsMessages: TeamsMessage[];
@@ -65,6 +66,7 @@ const initial = {
   activeQte: null as QteType,
   qteStep: "incoming" as const,
   caughtMessage: null as string | null,
+  managementNotices: 0,
   muted: false,
   cutsceneKind: "slap" as const,
   teamsMessages: [] as TeamsMessage[],
@@ -118,8 +120,18 @@ export const useGameStore = create<GameState>((set, get) => ({
   }),
   triggerQte: (activeQte) => set({ activeQte, qteStep: "incoming" }),
   advanceQte: () => set((state) => state.activeQte === "call" && state.qteStep === "incoming" ? { qteStep: "unmute" } : { activeQte: null, scrollSeconds: 0 }),
-  failQte: () => set((state) => ({ activeQte: null, qteStep: "incoming", scrollSeconds: 0, energy: Math.max(0, state.energy - 25), caughtMessage: "Per my last message… this has been noted." })),
-  dismissCaught: () => set({ caughtMessage: null }),
+  failQte: () => set((state) => ({
+    activeQte: null,
+    qteStep: "incoming",
+    scrollSeconds: 0,
+    energy: Math.max(0, state.energy - 25),
+    caughtMessage: "Per my last message… this has been noted.",
+    managementNotices: Math.min(3, state.managementNotices + 1),
+  })),
+  dismissCaught: () => set((state) => ({
+    caughtMessage: null,
+    ...(state.managementNotices >= 3 ? { phase: "gameOver" as const } : {}),
+  })),
   beginPromotion: () => set({ phase: "cutscene", cutsceneKind: "slap" }),
   finishCutscene: () => set((state) => {
     if (state.cutsceneKind === "wake") return { phase: "gameOver" };
