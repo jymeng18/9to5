@@ -236,13 +236,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     } else if (text.trim()) {
       const history = state.teamsMessages
         .filter((message) => message.bossIndex === bossIdx)
-        .slice(-8)
+        .slice(-4)
         .map((message) => ({
           speaker: message.sender === "boss" ? ("boss" as const) : ("employee" as const),
-          text: message.text,
+          text: message.text.slice(0, 200),
         }));
       const started = Date.now();
-      const minDelay = 1000 + Math.random() * 1000;
+      const minDelay = 600 + Math.random() * 600;
       void askBoss({ data: { bossIndex: bossIdx, message: text, history } })
         .then(({ reply }) => {
           const wait = Math.max(0, minDelay - (Date.now() - started));
