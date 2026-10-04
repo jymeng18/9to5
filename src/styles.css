@@ -437,6 +437,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px
 .teams-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:14px}
 .teams-no-msgs{font-size:12px;color:var(--muted-foreground);text-align:center;margin:auto}
 .teams-msg{display:flex;align-items:flex-start;gap:10px}.teams-msg-body{display:flex;flex-direction:column;gap:3px}.teams-msg-meta{display:flex;align-items:baseline;gap:8px}.teams-msg-meta strong{font-size:13px}.teams-msg-meta time{font-size:10px;color:var(--muted-foreground)}.teams-msg p{margin:0;font-size:12px;line-height:1.5}
+.teams-session-divider{align-self:stretch;height:1px;background:var(--border);opacity:.5;margin:2px 0}
 
 /* Autocomplete */
 .teams-autocomplete{border-top:1px solid var(--border);background:var(--office-panel);display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px}

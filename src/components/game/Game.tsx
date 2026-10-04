@@ -65,7 +65,7 @@ function Desktop() {
             <button type="button" aria-label="Acknowledge management notice" onClick={dismissCaught}>×</button>
           </header>
           <div className="caught-modal-body">
-            <p className="caught-sentence">Your response to a Teams message was not received.</p>
+            <p className="caught-sentence">Management has flagged your last reply.</p>
             <p id="caught-modal-description" className="caught-message">"{caughtMessage}"</p>
             <p className="caught-record">Management notice {managementNotices} of 3</p>
             <p className="caught-penalty">{managementNotices >= 3 ? "Three notices recorded. Your employment is terminated." : `${3 - managementNotices} warning${managementNotices === 2 ? "" : "s"} remaining before termination.`}</p>

@@ -1,12 +1,7 @@
-import { useRef, useState, useEffect } from "react";
-import { getBoss, type ReplyCategory } from "@/game/bosses";
+import { Fragment, useRef, useState, useEffect, useMemo } from "react";
+import { getBoss } from "@/game/bosses";
+import { getEvent } from "@/game/events";
 import { useGameStore } from "@/game/store";
-
-const QUICK_REPLIES: Array<{ text: string; category: ReplyCategory }> = [
-  { text: "I was reviewing Reels; returning to the deliverable now.", category: "reels" },
-  { text: "I am currently working through the deliverable.", category: "work" },
-  { text: "I am between tasks and will begin the next action now.", category: "idle" },
-];
 
 const AVATAR_COLORS = [
   "oklch(0.52 0.22 260)",   // Gary — blue
@@ -28,7 +23,18 @@ export function TeamsApp() {
   const setTeamsActiveDm = useGameStore((state) => state.setTeamsActiveDm);
   const sendTeamsMessage = useGameStore((state) => state.sendTeamsMessage);
   const bossIndex = useGameStore((state) => state.bossIndex);
-  const activeMessageCategory = useGameStore((state) => state.activeMessageCategory);
+  const activeQte = useGameStore((state) => state.activeQte);
+  const activeEventId = useGameStore((state) => state.activeEventId);
+
+  const activeEvent = useMemo(() => {
+    const isReplyPrompt = activeQte === "message" && teamsActiveDm === bossIndex;
+    return isReplyPrompt ? getEvent(activeEventId) : null;
+  }, [activeQte, activeEventId, bossIndex, teamsActiveDm]);
+
+  const suggestions = useMemo(() => {
+    if (!activeEvent) return [];
+    return [...activeEvent.answers].sort(() => Math.random() - 0.5);
+  }, [activeEvent]);
 
   // Show DM rows for current boss + any who've messaged
   const dmBossIndexes = ([0, 1, 2] as const).filter(
@@ -47,12 +53,11 @@ export function TeamsApp() {
   // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [activeMsgs.length]);
+  }, [activeMsgs.length, showReplies]);
 
   function handleSend() {
     if (!input.trim() || teamsActiveDm === null) return;
-    const quickReply = QUICK_REPLIES.find((reply) => reply.text === input.trim());
-    sendTeamsMessage(teamsActiveDm, input.trim(), quickReply?.category ?? "general");
+    sendTeamsMessage(teamsActiveDm, input.trim());
     setInput("");
     setShowReplies(false);
   }
@@ -119,39 +124,47 @@ export function TeamsApp() {
               {activeMsgs.length === 0 && (
                 <p className="teams-no-msgs">No messages yet in this conversation.</p>
               )}
-              {activeMsgs.map((msg) => {
+              {activeMsgs.map((msg, index) => {
                 const d = new Date(msg.timestamp);
                 const time = `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
                 const isPlayer = msg.sender === "player";
+                const previous = activeMsgs[index - 1];
+                const startsNewSession =
+                  index > 0 &&
+                  msg.session != null &&
+                  previous?.session != null &&
+                  msg.session !== previous.session;
                 return (
-                  <div key={msg.id} className={`teams-msg ${isPlayer ? "player" : ""}`}>
-                    <BossAvatar 
-                      initials={isPlayer ? "ME" : activeBoss.initials} 
-                      bossIdx={teamsActiveDm} 
-                      isPlayer={isPlayer} 
-                    />
-                    <div className="teams-msg-body">
-                      <div className="teams-msg-meta">
-                        <strong>{isPlayer ? "New Hire (You)" : activeBoss.name}</strong>
-                        <time>{time}</time>
+                  <Fragment key={msg.id}>
+                    {startsNewSession && <div className="teams-session-divider" />}
+                    <div className={`teams-msg ${isPlayer ? "player" : ""}`}>
+                      <BossAvatar 
+                        initials={isPlayer ? "ME" : activeBoss.initials} 
+                        bossIdx={teamsActiveDm} 
+                        isPlayer={isPlayer} 
+                      />
+                      <div className="teams-msg-body">
+                        <div className="teams-msg-meta">
+                          <strong>{isPlayer ? "New Hire (You)" : activeBoss.name}</strong>
+                          <time>{time}</time>
+                        </div>
+                        <p>{msg.text}</p>
                       </div>
-                      <p>{msg.text}</p>
                     </div>
-                  </div>
+                  </Fragment>
                 );
               })}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Quick replies */}
-            {showReplies && (
+            {/* Suggested replies */}
+            {showReplies && suggestions.length > 0 && (
               <div className="teams-autocomplete">
-                {QUICK_REPLIES.map((reply) => (
+                {suggestions.map((reply) => (
                   <button
                     key={reply.text}
                     type="button"
-                    className={`teams-autocomplete-item${reply.category === activeMessageCategory ? " recommended" : ""}`}
-                    title={`Response category: ${reply.category}`}
+                    className="teams-autocomplete-item"
                     onMouseDown={(event) => {
                       event.preventDefault();
                       setInput(reply.text);
@@ -159,7 +172,6 @@ export function TeamsApp() {
                     }}
                   >
                     {reply.text}
-                    <small>{reply.category}</small>
                   </button>
                 ))}
               </div>
