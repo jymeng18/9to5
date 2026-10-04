@@ -57,7 +57,6 @@ export function BossCutscenePlayer({
           ref={videoRef}
           src={src}
           playsInline
-          controls
           onEnded={onClose}
           onError={onClose}
         />
