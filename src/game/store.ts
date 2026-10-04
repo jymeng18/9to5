@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { BALANCE } from "./balance";
-import { getBoss, type AppId } from "./bosses";
+import { getBoss, getBossMessage, type AppId, type BossActivity, type ReplyCategory } from "./bosses";
 
 export type Phase = "title" | "playing" | "promotion" | "cutscene" | "gameOver" | "victory";
 export type QteType = null | "message" | "call" | "sneak";
@@ -28,6 +28,8 @@ interface GameState {
   qteStep: "incoming" | "unmute";
   caughtMessage: string | null;
   managementNotices: number;
+  activeMessageCategory: BossActivity | null;
+  activeMessageText: string | null;
   muted: boolean;
   cutsceneKind: "slap" | "wake";
   teamsMessages: TeamsMessage[];
@@ -49,7 +51,7 @@ interface GameState {
   toggleMute: () => void;
   openTeamsDm: (bossIdx: 0 | 1 | 2) => void;
   setTeamsActiveDm: (bossIdx: 0 | 1 | 2 | null) => void;
-  sendTeamsMessage: (bossIdx: 0 | 1 | 2, text: string) => void;
+  sendTeamsMessage: (bossIdx: 0 | 1 | 2, text: string, category: ReplyCategory | "general") => void;
 }
 
 const initial = {
@@ -67,6 +69,8 @@ const initial = {
   qteStep: "incoming" as const,
   caughtMessage: null as string | null,
   managementNotices: 0,
+  activeMessageCategory: null,
+  activeMessageText: null,
   muted: false,
   cutsceneKind: "slap" as const,
   teamsMessages: [] as TeamsMessage[],
@@ -100,8 +104,10 @@ export const useGameStore = create<GameState>((set, get) => ({
     const scrollSeconds = resting ? state.scrollSeconds + 1 : 0;
     const totalSeconds = state.totalSeconds + 1;
     const boss = getBoss(state.bossIndex);
+    const activity: BossActivity = resting ? "reels" : state.focusedApp === null ? "idle" : "work";
     let activeQte: QteType = null;
     let newTeamsMessages = state.teamsMessages;
+    let activeMessageText: string | null = null;
     
     const workMessageInterval = boss.messageEvery * 3;
     
@@ -110,18 +116,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     else if ((resting && scrollSeconds > 0 && scrollSeconds % boss.messageEvery === 0) || (!resting && totalSeconds > 0 && totalSeconds % workMessageInterval === 0)) {
       activeQte = "message";
       // Persist message into Teams DMs
-      const msgText = boss.messages[Math.floor(Date.now() / 1000) % boss.messages.length] ?? boss.messages[0] ?? "";
+      const msgText = getBossMessage(boss, activity);
+      activeMessageText = msgText;
       newTeamsMessages = [
         ...state.teamsMessages,
         { id: `msg-${++msgCounter}`, bossIndex: state.bossIndex, text: msgText, timestamp: Date.now(), sender: "boss" },
       ];
     }
-    return { energy, scrollSeconds, totalSeconds, activeQte, qteStep: "incoming", teamsMessages: newTeamsMessages };
+    return { energy, scrollSeconds, totalSeconds, activeQte, qteStep: "incoming", activeMessageCategory: activeQte === "message" ? activity : null, activeMessageText, teamsMessages: newTeamsMessages };
   }),
   triggerQte: (activeQte) => set({ activeQte, qteStep: "incoming" }),
-  advanceQte: () => set((state) => state.activeQte === "call" && state.qteStep === "incoming" ? { qteStep: "unmute" } : { activeQte: null, scrollSeconds: 0 }),
+  advanceQte: () => set((state) => state.activeQte === "call" && state.qteStep === "incoming" ? { qteStep: "unmute" } : { activeQte: null, activeMessageCategory: null, activeMessageText: null, scrollSeconds: 0 }),
   failQte: () => set((state) => ({
     activeQte: null,
+    activeMessageCategory: null,
+    activeMessageText: null,
     qteStep: "incoming",
     scrollSeconds: 0,
     energy: Math.max(0, state.energy - 25),
@@ -148,14 +157,27 @@ export const useGameStore = create<GameState>((set, get) => ({
     teamsActiveDm: bossIdx,
   })),
   setTeamsActiveDm: (bossIdx) => set({ teamsActiveDm: bossIdx }),
-  sendTeamsMessage: (bossIdx, text) => set((state) => {
+  sendTeamsMessage: (bossIdx, text, category) => set((state) => {
     const isReplyingToBoss = state.activeQte === "message" && state.bossIndex === bossIdx;
+    const inappropriate = isReplyingToBoss && category !== state.activeMessageCategory;
+    const followUp = inappropriate ? "Please pay attention. That response does not address my message." : null;
     return {
       teamsMessages: [
         ...state.teamsMessages,
-        { id: `msg-${++msgCounter}`, bossIndex: bossIdx, text, timestamp: Date.now(), sender: "player" }
+        { id: `msg-${++msgCounter}`, bossIndex: bossIdx, text, timestamp: Date.now(), sender: "player" },
+        ...(followUp ? [{ id: `msg-${++msgCounter}`, bossIndex: bossIdx, text: followUp, timestamp: Date.now() + 1, sender: "boss" as const }] : []),
       ],
-      ...(isReplyingToBoss ? { activeQte: null, scrollSeconds: 0 } : {})
+      ...(isReplyingToBoss ? {
+        activeQte: null,
+        activeMessageCategory: null,
+        activeMessageText: null,
+        scrollSeconds: 0,
+        ...(inappropriate ? {
+          energy: Math.max(0, state.energy - 25),
+          caughtMessage: "You replied without addressing the question.",
+          managementNotices: Math.min(3, state.managementNotices + 1),
+        } : {}),
+      } : {})
     };
   }),
 }));

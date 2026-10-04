@@ -1,15 +1,11 @@
 import { useRef, useState, useEffect } from "react";
-import { getBoss } from "@/game/bosses";
+import { getBoss, type ReplyCategory } from "@/game/bosses";
 import { useGameStore } from "@/game/store";
 
-const QUICK_REPLIES = [
-  "Let's synergize! 🤝",
-  "Sounds good, circling back shortly.",
-  "On it — will update you EOD.",
-  "Per my last email, agreed.",
-  "Looping in the relevant stakeholders.",
-  "Happy to take this offline.",
-  "Noted! Actioning this now.",
+const QUICK_REPLIES: Array<{ text: string; category: ReplyCategory }> = [
+  { text: "I was reviewing Reels; returning to the deliverable now.", category: "reels" },
+  { text: "I am currently working through the deliverable.", category: "work" },
+  { text: "I am between tasks and will begin the next action now.", category: "idle" },
 ];
 
 const AVATAR_COLORS = [
@@ -32,6 +28,7 @@ export function TeamsApp() {
   const setTeamsActiveDm = useGameStore((state) => state.setTeamsActiveDm);
   const sendTeamsMessage = useGameStore((state) => state.sendTeamsMessage);
   const bossIndex = useGameStore((state) => state.bossIndex);
+  const activeMessageCategory = useGameStore((state) => state.activeMessageCategory);
 
   // Show DM rows for current boss + any who've messaged
   const dmBossIndexes = ([0, 1, 2] as const).filter(
@@ -54,7 +51,8 @@ export function TeamsApp() {
 
   function handleSend() {
     if (!input.trim() || teamsActiveDm === null) return;
-    sendTeamsMessage(teamsActiveDm, input.trim());
+    const quickReply = QUICK_REPLIES.find((reply) => reply.text === input.trim());
+    sendTeamsMessage(teamsActiveDm, input.trim(), quickReply?.category ?? "general");
     setInput("");
     setShowReplies(false);
   }
@@ -76,7 +74,7 @@ export function TeamsApp() {
         <div className="teams-nav-label">Direct Messages</div>
         {dmBossIndexes.map((idx) => {
           const boss = getBoss(idx);
-          const count = unreadByBoss[idx] ?? 0;
+          const count = teamsActiveDm === idx ? 0 : unreadByBoss[idx] ?? 0;
           return (
             <button
               key={idx}
@@ -150,12 +148,18 @@ export function TeamsApp() {
               <div className="teams-autocomplete">
                 {QUICK_REPLIES.map((reply) => (
                   <button
-                    key={reply}
+                    key={reply.text}
                     type="button"
-                    className="teams-autocomplete-item"
-                    onMouseDown={() => { setInput(reply); setShowReplies(false); }}
+                    className={`teams-autocomplete-item${reply.category === activeMessageCategory ? " recommended" : ""}`}
+                    title={`Response category: ${reply.category}`}
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      setInput(reply.text);
+                      setShowReplies(false);
+                    }}
                   >
-                    {reply}
+                    {reply.text}
+                    <small>{reply.category}</small>
                   </button>
                 ))}
               </div>

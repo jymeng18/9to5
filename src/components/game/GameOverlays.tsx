@@ -10,6 +10,7 @@ export function QteOverlay() {
   const fail = useGameStore((state) => state.failQte);
   const minimize = useGameStore((state) => state.minimizeApp);
   const openTeamsDm = useGameStore((state) => state.openTeamsDm);
+  const activeMessageText = useGameStore((state) => state.activeMessageText);
   const [left, setLeft] = useState(getBoss(bossIndex).reactionWindow);
   const boss = getBoss(bossIndex);
 
@@ -31,7 +32,7 @@ export function QteOverlay() {
   if (!activeQte) return null;
 
   if (activeQte === "message") {
-    const msgText = boss.messages[Math.floor(Date.now() / 1000) % boss.messages.length];
+    const msgText = activeMessageText ?? "Please advise.";
     return (
       <aside className="squads-toast">
         <div className="squads-head">

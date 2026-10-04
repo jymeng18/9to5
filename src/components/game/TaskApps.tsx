@@ -270,7 +270,7 @@ export function TaskApps() {
     if (app === "sheets") return <XpWindow key={app} {...common} width={650}><SheetsApp task={currentTask("sheets", bossIndex, completed)} /></XpWindow>;
     if (app === "notes") return <XpWindow key={app} {...common}><NotesApp task={currentTask("notes", bossIndex, completed)} /></XpWindow>;
     if (app === "break") return <XpWindow key={app} {...common} width={400} height={700}><BreakRoom /></XpWindow>;
-    if (app === "teams") return <XpWindow key={app} {...common} width={760} height={520}><TeamsApp /></XpWindow>;
+    if (app === "teams") return <XpWindow key={app} {...common} width={900} height={620} showMenu={false}><TeamsApp /></XpWindow>;
     return <XpWindow key={app} {...common} width={390} height={230}><div className="recycle-app">🗑️<strong>Your dignity</strong><span>0 bytes</span></div></XpWindow>;
   })}</>;
 }

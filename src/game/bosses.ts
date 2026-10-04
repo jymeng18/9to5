@@ -1,5 +1,7 @@
 export type BossId = "manager" | "seniorManager" | "vp";
 export type AppId = "files" | "sheets" | "notes" | "break" | "recycle" | "teams";
+export type BossActivity = "reels" | "idle" | "work";
+export type ReplyCategory = BossActivity;
 
 export interface MissionTask {
   id: string;
@@ -18,6 +20,7 @@ export interface Boss {
   sneakEvery?: number;
   reactionWindow: number;
   messages: string[];
+  activityMessages: Record<BossActivity, string[]>;
   missions: MissionTask[];
 }
 
@@ -35,12 +38,17 @@ export const BOSSES: Boss[] = [
     title: "Manager",
     initials: "GM",
     messageEvery: 15,
-    reactionWindow: 9,
+    reactionWindow: 14,
     messages: [
       "Quick sync? Need to leverage your bandwidth ASAP.",
       "Are we aligned on the north star here?",
       "Please advise on next steps before EOD.",
     ],
+    activityMessages: {
+      reels: ["You have been on Reels for a while. Is that helping the deliverable?", "Are you watching videos during work hours?"],
+      idle: ["I do not see any activity. Please confirm what you are working on.", "Checking in. What is currently in progress?"],
+      work: ["Please send me a quick update on your current deliverable.", "How is the workstream progressing?"],
+    },
     missions: [
       task("m-file-1", "files", "File expense reports", "Sort Q3_expenses_FINAL.xlsx into Finance."),
       task("m-sheet-1", "sheets", "Correct forecast", "Update cell C3 to 42,000 and press Enter."),
@@ -56,12 +64,17 @@ export const BOSSES: Boss[] = [
     initials: "DS",
     messageEvery: 12,
     callEvery: 25,
-    reactionWindow: 8,
+    reactionWindow: 12,
     messages: [
       "Let's operationalize this learning immediately.",
       "I need a pre-read for the pre-read by noon.",
       "Can you socialize this across the workstream?",
     ],
+    activityMessages: {
+      reels: ["Are those Reels part of the research plan?", "I am seeing leisure activity during a work block. Please explain."],
+      idle: ["There has been no visible activity. Should I expect an update?", "Please confirm ownership of the next action."],
+      work: ["Can you socialize a status update across the workstream?", "Please send the current state and next steps."],
+    },
     missions: [
       task("s-sheet-1", "sheets", "Fix revenue model", "Update cell C3 to 42,000 and press Enter."),
       task("s-note-1", "notes", "Manage expectations", "Let's take this offline and align on deliverables."),
@@ -78,12 +91,17 @@ export const BOSSES: Boss[] = [
     messageEvery: 10,
     callEvery: 20,
     sneakEvery: 30,
-    reactionWindow: 7,
+    reactionWindow: 10,
     messages: [
       "Visibility is accountability. Where is the deck?",
       "This needs executive-ready thinking, not activity.",
       "I am adding the leadership team for awareness.",
     ],
+    activityMessages: {
+      reels: ["The leadership team can see that you are watching Reels. Explain the business value.", "This is not executive-ready activity."],
+      idle: ["Visibility is accountability. Why is there no activity?", "I need a status update, not silence."],
+      work: ["Where is the executive-ready update?", "Please provide the current status and any risks."],
+    },
     missions: [
       task("v-note-1", "notes", "Write transformation memo", "We will unlock enterprise value through disciplined execution."),
       task("v-sheet-1", "sheets", "Normalize the outlook", "Delete the red rows."),
@@ -110,5 +128,11 @@ const fallbackBoss: Boss = {
   messageEvery: 12,
   reactionWindow: 5,
   messages: ["Please advise."],
+  activityMessages: { reels: ["Please stop watching videos."], idle: ["Please advise."], work: ["Please advise."] },
   missions: [],
 };
+
+export function getBossMessage(boss: Boss, activity: BossActivity): string {
+  const messages = boss.activityMessages[activity];
+  return messages[Math.floor(Date.now() / 1000) % messages.length] ?? boss.messages[0] ?? "Please advise.";
+}

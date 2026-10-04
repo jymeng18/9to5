@@ -11,9 +11,10 @@ interface XpWindowProps {
   height?: number;
   x?: number;
   y?: number;
+  showMenu?: boolean;
 }
 
-export function XpWindow({ app, title, icon, children, width = 590, height = 410, x = 260, y = 150 }: XpWindowProps) {
+export function XpWindow({ app, title, icon, children, width = 590, height = 410, x = 260, y = 150, showMenu = true }: XpWindowProps) {
   const focusedApp = useGameStore((state) => state.focusedApp);
   const focusApp = useGameStore((state) => state.focusApp);
   const minimizeApp = useGameStore((state) => state.minimizeApp);
@@ -44,7 +45,7 @@ export function XpWindow({ app, title, icon, children, width = 590, height = 410
 
   return (
     <section
-      className="xp-window"
+      className={`xp-window${showMenu ? "" : " xp-window-no-menu"}`}
       data-focused={focused}
       onMouseDown={() => focusApp(app)}
       style={{ width, height, transform: `translate(${position.x}px, ${position.y}px)`, zIndex: focused ? 40 : 20 }}
@@ -63,7 +64,7 @@ export function XpWindow({ app, title, icon, children, width = 590, height = 410
           <button type="button" aria-label={`Close ${title}`} className="xp-close" onMouseDown={(event) => event.stopPropagation()} onClick={() => closeApp(app)}>×</button>
         </div>
       </header>
-      <div className="xp-menu">File&nbsp;&nbsp; Edit&nbsp;&nbsp; View&nbsp;&nbsp; Help</div>
+      {showMenu && <div className="xp-menu">File&nbsp;&nbsp; Edit&nbsp;&nbsp; View&nbsp;&nbsp; Help</div>}
       <div className="xp-window-body">{children}</div>
     </section>
   );
