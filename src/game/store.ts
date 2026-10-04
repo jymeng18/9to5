@@ -124,7 +124,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     return { completed: [...state.completed, id], xp, energy: Math.max(0, state.energy - BALANCE.taskEnergy), phase: xp >= 100 ? "promotion" : state.phase };
   }),
   tick: () => set((state) => {
-    if (state.phase !== "playing" || state.activeQte) return state;
+    if (state.phase !== "playing" || state.activeQte || state.bossEventStage !== "idle") return state;
     const resting = state.focusedApp === "break" && !state.minimizedApps.includes("break");
     const energy = Math.max(0, Math.min(100, state.energy + (resting ? BALANCE.scrollRecoveryPerSecond : -BALANCE.passiveDrainPerSecond)));
     if (energy <= 0) return { energy: 0, phase: "cutscene", cutsceneKind: "wake", activeQte: null };
