@@ -149,6 +149,9 @@ describe("boss webcam event", () => {
       }),
     );
 
+    expect(
+      container.querySelector(".boss-cutscene-frame > video"),
+    ).not.toBeNull();
     fireEvent.error(container.querySelector("video")!);
 
     expect(onClose).toHaveBeenCalledOnce();

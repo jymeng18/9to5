@@ -52,14 +52,16 @@ export function BossCutscenePlayer({
 
   return (
     <section className="boss-cutscene-stage" aria-label={`${outcome} cutscene`}>
-      <video
-        ref={videoRef}
-        src={src}
-        playsInline
-        controls
-        onEnded={onClose}
-        onError={onClose}
-      />
+      <div className="boss-cutscene-frame">
+        <video
+          ref={videoRef}
+          src={src}
+          playsInline
+          controls
+          onEnded={onClose}
+          onError={onClose}
+        />
+      </div>
       {needsPlay && (
         <button
           type="button"

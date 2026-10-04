@@ -11,6 +11,7 @@ import {
   BOSS_TURN_TOO_LATE_CUTSCENE_SRC,
   BOSS_WEBCAM_STICKER_SRC,
 } from "@/game/bossEvent";
+import { nextCameraRun } from "@/game/bossWebcamLab";
 import type { BossCutsceneOutcome } from "@/game/store";
 
 export const Route = createFileRoute("/boss-webcam-lab")({
@@ -33,7 +34,7 @@ function BossWebcamLab() {
   const selectSide = (nextSide: BossSide) => {
     setSide(nextSide);
     setResult(`${nextSide === "right" ? "Right" : "Left"} preview starting…`);
-    setCameraRun((current) => (current ?? 0) + 1);
+    setCameraRun(nextCameraRun);
   };
 
   return (
@@ -89,7 +90,7 @@ function BossWebcamLab() {
               type="button"
               onClick={() => {
                 setResult("Camera preview starting…");
-                setCameraRun((current) => (current ?? 0) + 1);
+                setCameraRun(nextCameraRun);
               }}
             >
               Start / restart camera
@@ -141,8 +142,14 @@ function BossWebcamLab() {
           <WebcamTurnWindow
             countdownMs={60_000}
             forcedBossSide={side}
-            onTurnDetected={() => setResult("In-time turn detected.")}
-            onTimedOut={() => setResult("The 60-second lab timer expired.")}
+            onTurnDetected={() => {
+              setResult("In-time turn detected. Restarting camera preview…");
+              setCameraRun(nextCameraRun);
+            }}
+            onTimedOut={() => {
+              setResult("The lab timer expired. Restarting camera preview…");
+              setCameraRun(nextCameraRun);
+            }}
             onClose={() => void navigate({ to: "/" })}
           />
         )}
