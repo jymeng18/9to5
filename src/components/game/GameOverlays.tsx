@@ -36,12 +36,17 @@ export function QteOverlay() {
       <aside className="squads-toast">
         <div className="squads-head">
           <span>T</span>
-          <strong>Microsoft Teams</strong>
-          <b>{left}s</b>
+          <div>
+            <strong>Microsoft Teams</strong>
+            <small>New message</small>
+          </div>
+          <b className={`squads-countdown${left <= 3 ? " urgent" : ""}`} aria-label={`${left} seconds remaining`}>
+            <i>{left}</i><small>SEC</small>
+          </b>
         </div>
         <div className="boss-avatar small">{boss.initials}</div>
         <div>
-          <strong>{boss.name}</strong>
+          <strong>{boss.name} <small>· {boss.title}</small></strong>
           <p>{msgText}</p>
           <div className="squads-toast-actions">
             <button type="button" onClick={() => openTeamsDm(bossIndex)}>

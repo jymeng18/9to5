@@ -70,8 +70,9 @@ export function TeamsApp() {
       <nav className="teams-sidebar">
         <div className="teams-sidebar-header">
           <div className="teams-logo-icon">T</div>
-          <span>Microsoft Teams</span>
+          <div><strong>Microsoft Teams</strong><small>Corporate network</small></div>
         </div>
+        <div className="teams-account"><span className="teams-status-dot" /> New Hire <small>Available</small></div>
         <div className="teams-nav-label">Direct Messages</div>
         {dmBossIndexes.map((idx) => {
           const boss = getBoss(idx);
@@ -88,7 +89,7 @@ export function TeamsApp() {
                 <strong>{boss.name}</strong>
                 <small>{boss.title}</small>
               </span>
-              {/* Notification badge only useful if we had read-state, but we show total boss msgs */}
+              {count > 0 && <span className="teams-badge">{count}</span>}
             </button>
           );
         })}
@@ -111,8 +112,9 @@ export function TeamsApp() {
               <BossAvatar initials={activeBoss.initials} bossIdx={teamsActiveDm} />
               <div>
                 <strong>{activeBoss.name}</strong>
-                <small>{activeBoss.title}</small>
+                <small><span className="teams-status-dot" /> {activeBoss.title} · Direct message</small>
               </div>
+              <div className="teams-chat-actions"><button type="button" aria-label="Start audio call">☎</button><button type="button" aria-label="More conversation options">•••</button></div>
             </header>
 
             <div className="teams-messages">
@@ -161,16 +163,19 @@ export function TeamsApp() {
 
             {/* Input */}
             <div className="teams-input-area">
-              <input
-                className="teams-input"
-                type="text"
-                placeholder={`Message ${activeBoss.name}…`}
-                value={input}
-                onChange={(e) => { setInput(e.target.value); setShowReplies(e.target.value === ""); }}
-                onFocus={() => setShowReplies(true)}
-                onBlur={() => setTimeout(() => setShowReplies(false), 150)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
-              />
+              <div className="teams-compose">
+                <div className="teams-compose-tools"><button type="button" aria-label="Format message">A</button><button type="button" aria-label="Attach file">📎</button><button type="button" aria-label="Add emoji">☺</button></div>
+                <input
+                  className="teams-input"
+                  type="text"
+                  placeholder={`Message ${activeBoss.name}…`}
+                  value={input}
+                  onChange={(e) => { setInput(e.target.value); setShowReplies(e.target.value === ""); }}
+                  onFocus={() => setShowReplies(true)}
+                  onBlur={() => setTimeout(() => setShowReplies(false), 150)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
+                />
+              </div>
               <button type="button" className="teams-send" onClick={handleSend}>➤</button>
             </div>
           </>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type WheelEvent } from "react";
 import { getBoss, type AppId, type MissionTask } from "@/game/bosses";
 import { useGameStore } from "@/game/store";
 import { XpWindow } from "./XpWindow";
@@ -100,12 +100,30 @@ function BreakRoom() {
   const [index, setIndex] = useState(0);
   const [liked, setLiked] = useState<Set<number>>(new Set());
   const [transitioning, setTransitioning] = useState(false);
+  const wheelLocked = useRef(false);
+  const wheelUnlockTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (wheelUnlockTimer.current !== null) window.clearTimeout(wheelUnlockTimer.current);
+  }, []);
 
   const navigate = (dir: 1 | -1) => {
     if (transitioning) return;
     setTransitioning(true);
     setIndex((i) => (i + dir + slides.length) % slides.length);
     setTimeout(() => setTransitioning(false), 450);
+  };
+
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (wheelLocked.current || transitioning || event.deltaY === 0) return;
+    wheelLocked.current = true;
+    navigate(event.deltaY > 0 ? 1 : -1);
+    if (wheelUnlockTimer.current !== null) window.clearTimeout(wheelUnlockTimer.current);
+    wheelUnlockTimer.current = window.setTimeout(() => {
+      wheelLocked.current = false;
+      wheelUnlockTimer.current = null;
+    }, 550);
   };
 
   const toggleLike = (i: number) => {
@@ -122,8 +140,8 @@ function BreakRoom() {
     <div
       className="break-app"
       tabIndex={0}
-      onWheel={(event) => { if (event.deltaY > 0) navigate(1); else navigate(-1); }}
-      onKeyDown={(event) => { if (event.key === "ArrowDown") navigate(1); if (event.key === "ArrowUp") navigate(-1); }}
+      onWheel={handleWheel}
+      onKeyDown={(event) => { if (event.repeat) return; if (event.key === "ArrowDown") navigate(1); if (event.key === "ArrowUp") navigate(-1); }}
     >
       {/* Ambient background */}
       <div className="reel-bg" data-slide={index}>
@@ -235,11 +253,6 @@ function BreakRoom() {
         <div className="reel-progress-fill" />
       </div>
 
-      {/* Energy indicator */}
-      <div className="energy-float">
-        <span className="energy-float-icon">⚡</span>
-        +3 energy/sec
-      </div>
     </div>
   );
 }
