@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { BALANCE } from "./balance";
 import { getBoss, type AppId } from "./bosses";
+import { askBoss } from "./bossChat";
 import { getEvent, pickEvent } from "./events";
 
 export type Phase = "title" | "playing" | "promotion" | "cutscene" | "gameOver" | "victory";
@@ -213,7 +214,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const answer = event?.answers.find((option) => option.text === text) ?? null;
     const failed = isReplyingToBoss && answer?.quality === "bad";
     const session = state.activeSession;
-    const followUp = isReplyingToBoss && event ? (answer?.reply ?? "Noted.") : null;
+    const followUp = isReplyingToBoss && event && answer ? answer.reply : null;
 
     const nextMessages: TeamsMessage[] = [
       ...state.teamsMessages,
@@ -232,6 +233,32 @@ export const useGameStore = create<GameState>((set, get) => ({
         }));
       }, delay);
       replyTimers.push(timer);
+    } else if (text.trim()) {
+      const history = state.teamsMessages
+        .filter((message) => message.bossIndex === bossIdx)
+        .slice(-8)
+        .map((message) => ({
+          speaker: message.sender === "boss" ? ("boss" as const) : ("employee" as const),
+          text: message.text,
+        }));
+      const started = Date.now();
+      const minDelay = 1000 + Math.random() * 1000;
+      void askBoss({ data: { bossIndex: bossIdx, message: text, history } })
+        .then(({ reply }) => {
+          const wait = Math.max(0, minDelay - (Date.now() - started));
+          const timer = window.setTimeout(() => {
+            set((current) => ({
+              teamsMessages: [
+                ...current.teamsMessages,
+                { id: `msg-${++msgCounter}`, bossIndex: bossIdx, text: reply, timestamp: Date.now(), sender: "boss", ...(session != null ? { session } : {}) },
+              ],
+            }));
+          }, wait);
+          replyTimers.push(timer);
+        })
+        .catch(() => {
+          // Server function failed; keep the conversation going without a reply.
+        });
     }
 
     set({
