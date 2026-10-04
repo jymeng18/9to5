@@ -42,7 +42,7 @@ export const BOSSES: Boss[] = [
     photo: "/headshot/mike.jpg",
     cutscene: "/cutscenes/mike_execution.mp4",
     messageEvery: 15,
-    reactionWindow: 14,
+    reactionWindow: 24,
     messages: [
       "Quick sync? Need to leverage your bandwidth ASAP.",
       "Are we aligned on the north star here?",
@@ -70,7 +70,7 @@ export const BOSSES: Boss[] = [
     cutscene: "/cutscenes/ry_execution.mp4",
     messageEvery: 12,
     callEvery: 25,
-    reactionWindow: 12,
+    reactionWindow: 22,
     messages: [
       "Let's operationalize this learning immediately.",
       "I need a pre-read for the pre-read by noon.",
@@ -99,7 +99,7 @@ export const BOSSES: Boss[] = [
     messageEvery: 10,
     callEvery: 20,
     sneakEvery: 30,
-    reactionWindow: 10,
+    reactionWindow: 20,
     messages: [
       "Visibility is accountability. Where is the deck?",
       "This needs executive-ready thinking, not activity.",
@@ -136,7 +136,7 @@ const fallbackBoss: Boss = {
   photo: "/headshot/mike.jpg",
   cutscene: "/cutscenes/mike_execution.mp4",
   messageEvery: 12,
-  reactionWindow: 5,
+  reactionWindow: 15,
   messages: ["Please advise."],
   activityMessages: { reels: ["Please stop watching videos."], idle: ["Please advise."], work: ["Please advise."] },
   missions: [],
