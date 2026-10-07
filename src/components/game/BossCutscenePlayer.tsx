@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { BossCutsceneOutcome } from "@/game/store";
 
 type BossCutscenePlayerProps = {
@@ -16,12 +16,23 @@ export function BossCutscenePlayer({
 }: BossCutscenePlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [needsPlay, setNeedsPlay] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  const requestPlay = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video
+      .play()
+      .then(() => setNeedsPlay(false))
+      .catch(() => setNeedsPlay(true));
+  }, []);
 
   useEffect(() => {
     setNeedsPlay(false);
-    if (!src || !videoRef.current) return;
-    void videoRef.current.play().catch(() => setNeedsPlay(true));
-  }, [src]);
+    setReady(false);
+    if (!src) return;
+    requestPlay();
+  }, [src, requestPlay]);
 
   if (!src) {
     return (
@@ -57,18 +68,24 @@ export function BossCutscenePlayer({
           ref={videoRef}
           src={src}
           playsInline
+          autoPlay
+          preload="auto"
+          onLoadedData={() => setReady(true)}
+          onPlaying={() => setReady(true)}
           onEnded={onClose}
           onError={onClose}
         />
+        {!ready && !needsPlay && (
+          <p className="boss-cutscene-loading" role="status">
+            Loading cutscene…
+          </p>
+        )}
       </div>
       {needsPlay && (
         <button
           type="button"
           className="boss-cutscene-play"
-          onClick={() => {
-            void videoRef.current?.play();
-            setNeedsPlay(false);
-          }}
+          onClick={requestPlay}
         >
           Play cutscene
         </button>

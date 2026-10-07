@@ -230,4 +230,53 @@ describe("boss webcam event", () => {
     expect(useGameStore.getState().bossEventStage).toBe("idle");
     expect(useGameStore.getState().bossCutsceneOutcome).toBeNull();
   });
+
+  describe("skip-level cheat", () => {
+    it("advances to the next boss with clean state", () => {
+      useGameStore.getState().restart();
+      useGameStore.setState({
+        phase: "playing",
+        bossIndex: 0,
+        xp: 80,
+        completed: ["m-file-1"],
+        openApps: ["teams"],
+        managementNotices: 2,
+        bossEventStage: "webcam",
+      });
+
+      useGameStore.getState().skipLevel();
+
+      expect(useGameStore.getState()).toMatchObject({
+        phase: "playing",
+        bossIndex: 1,
+        xp: 0,
+        completed: [],
+        openApps: [],
+        managementNotices: 0,
+        bossEventStage: "idle",
+        bossCutsceneOutcome: null,
+      });
+    });
+
+    it("finishes the run with victory from the final boss", () => {
+      useGameStore.setState({ phase: "playing", bossIndex: 2 });
+
+      useGameStore.getState().skipLevel();
+
+      expect(useGameStore.getState().phase).toBe("victory");
+      expect(useGameStore.getState().bossEventStage).toBe("idle");
+    });
+
+    it("is ignored outside active play", () => {
+      useGameStore.getState().restart();
+      useGameStore.setState({ phase: "title", bossIndex: 1 });
+
+      useGameStore.getState().skipLevel();
+
+      expect(useGameStore.getState()).toMatchObject({
+        phase: "title",
+        bossIndex: 1,
+      });
+    });
+  });
 });

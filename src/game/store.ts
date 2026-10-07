@@ -71,6 +71,7 @@ interface GameState {
   finishBossEvent: () => void;
   beginPromotion: () => void;
   finishCutscene: () => void;
+  skipLevel: () => void;
   restart: () => void;
   toggleMute: () => void;
   openTeamsDm: (bossIdx: 0 | 1 | 2) => void;
@@ -222,6 +223,43 @@ export const useGameStore = create<GameState>((set, get) => ({
     if (state.bossIndex === 2) return { phase: "victory" };
     const bossIndex = (state.bossIndex + 1) as 1 | 2;
     return { phase: "playing", bossIndex, xp: 0, energy: BALANCE.bossStartEnergy, completed: [], openApps: [], minimizedApps: [], focusedApp: null, scrollSeconds: 0, totalSeconds: 0, idleSeconds: 0, activeQte: null, activeEventId: null, activeMessageText: null, activeSession: null, usedEventIds: [], managementNotices: 0 };
+  }),
+  skipLevel: () => set((state) => {
+    if (state.phase !== "playing" && state.phase !== "promotion") return state;
+    if (state.bossIndex === 2) {
+      return {
+        phase: "victory" as const,
+        activeQte: null,
+        qteStep: "incoming" as const,
+        bossEventStage: "idle" as const,
+        bossCutsceneOutcome: null,
+        caughtMessage: null,
+      };
+    }
+    const bossIndex = (state.bossIndex + 1) as 1 | 2;
+    return {
+      phase: "playing" as const,
+      bossIndex,
+      xp: 0,
+      energy: BALANCE.bossStartEnergy,
+      completed: [],
+      openApps: [],
+      minimizedApps: [],
+      focusedApp: null,
+      scrollSeconds: 0,
+      totalSeconds: 0,
+      idleSeconds: 0,
+      activeQte: null,
+      qteStep: "incoming" as const,
+      activeEventId: null,
+      activeMessageText: null,
+      activeSession: null,
+      usedEventIds: [],
+      managementNotices: 0,
+      bossEventStage: "idle" as const,
+      bossCutsceneOutcome: null,
+      caughtMessage: null,
+    };
   }),
   restart: () => {
     replyTimers.forEach((timer) => window.clearTimeout(timer));

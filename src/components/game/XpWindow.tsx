@@ -14,6 +14,22 @@ interface XpWindowProps {
   showMenu?: boolean;
 }
 
+const TASKBAR_HEIGHT = 32;
+const EDGE_GUTTER = 16;
+const BOTTOM_GUTTER = 10;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(Math.max(min, max), value));
+}
+
+function fitToViewport(width: number, height: number) {
+  if (typeof window === "undefined") return { width, height };
+  return {
+    width: Math.min(width, Math.max(240, window.innerWidth - EDGE_GUTTER)),
+    height: Math.min(height, Math.max(200, window.innerHeight - TASKBAR_HEIGHT - BOTTOM_GUTTER)),
+  };
+}
+
 export function XpWindow({ app, title, icon, children, width = 590, height = 410, x = 260, y = 150, showMenu = true }: XpWindowProps) {
   const focusedApp = useGameStore((state) => state.focusedApp);
   const focusApp = useGameStore((state) => state.focusApp);
@@ -24,11 +40,26 @@ export function XpWindow({ app, title, icon, children, width = 590, height = 410
   const dragging = useRef<{ dx: number; dy: number } | null>(null);
 
   useEffect(() => {
+    const keepInView = () => {
+      const fit = fitToViewport(width, height);
+      setPosition((current) => {
+        const nextX = clamp(current.x, 0, window.innerWidth - fit.width);
+        const nextY = clamp(current.y, 0, window.innerHeight - TASKBAR_HEIGHT - fit.height);
+        return nextX === current.x && nextY === current.y ? current : { x: nextX, y: nextY };
+      });
+    };
+    keepInView();
+    window.addEventListener("resize", keepInView);
+    return () => window.removeEventListener("resize", keepInView);
+  }, [height, width]);
+
+  useEffect(() => {
     const move = (event: MouseEvent) => {
       if (!dragging.current) return;
+      const fit = fitToViewport(width, height);
       setPosition({
-        x: Math.max(0, Math.min(window.innerWidth - width, event.clientX - dragging.current.dx)),
-        y: Math.max(0, Math.min(window.innerHeight - height - 32, event.clientY - dragging.current.dy)),
+        x: clamp(event.clientX - dragging.current.dx, 0, window.innerWidth - fit.width),
+        y: clamp(event.clientY - dragging.current.dy, 0, window.innerHeight - TASKBAR_HEIGHT - fit.height),
       });
     };
     const up = () => { dragging.current = null; };
@@ -48,7 +79,12 @@ export function XpWindow({ app, title, icon, children, width = 590, height = 410
       className={`xp-window${showMenu ? "" : " xp-window-no-menu"}`}
       data-focused={focused}
       onMouseDown={() => focusApp(app)}
-      style={{ width, height, transform: `translate(${position.x}px, ${position.y}px)`, zIndex: focused ? 40 : 20 }}
+      style={{
+        width: `min(${width}px, calc(100vw - ${EDGE_GUTTER}px))`,
+        height: `min(${height}px, calc(100vh - ${TASKBAR_HEIGHT + BOTTOM_GUTTER}px))`,
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        zIndex: focused ? 40 : 20,
+      }}
       aria-label={title}
     >
       <header

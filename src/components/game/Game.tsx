@@ -76,6 +76,7 @@ function Desktop() {
   const failBossTurn = useGameStore((state) => state.failBossTurn);
   const dismissBossEvent = useGameStore((state) => state.dismissBossEvent);
   const finishBossEvent = useGameStore((state) => state.finishBossEvent);
+  const skipLevel = useGameStore((state) => state.skipLevel);
   const [startOpen, setStartOpen] = useState(false);
   const boss = getBoss(bossIndex);
   const mutedRef = useRef(muted);
@@ -98,6 +99,19 @@ function Desktop() {
     }
     return stopBossEventFootsteps;
   }, [bossEventStage, muted]);
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey || event.shiftKey) return;
+      if (event.key.toLowerCase() !== "c") return;
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || target.closest("input, textarea, [contenteditable='true']"))) return;
+      event.preventDefault();
+      console.info("[9to5 dev] Cheat: skipping to next level");
+      skipLevel();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [skipLevel]);
   const hour = 9 + Math.floor((xp / 100) * 8);
 
   return <main className="desktop" style={{ backgroundImage: `url(${wallpaper})` }} onMouseDown={() => setStartOpen(false)}>
