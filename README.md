@@ -1,9 +1,35 @@
 # 9to5
 
-**9to5** is a browser game that satirizes toxic corporate life. The player sits at a Windows XP desktop and works for three bosses in turn: Manager, Senior Manager, Vice President. The player finishes tiny office tasks to earn XP, spends energy doing so, and recovers energy by doomscrolling short videos while a boss tries to catch them. Fill the XP bar, slap the boss in a cutscene, get promoted, meet the next (worse) boss. Beat the VP and become CEO to win. Let energy hit zero and you fall asleep and lose.
+> Disclaimer: We are not against the corporate lifestyle. We are actually the number one fans of the corporate environment.
 
-## Boss webcam event
+A browser game about surviving toxic corporate life, played from a Windows XP-style desktop. Complete office tasks, doomscroll to recover energy, avoid your boss, and climb the ladder until you become CEO.
 
-The logged-in desktop includes a temporary trigger for the boss webcam sequence. It runs the creep and footstep effect, forces the webcam prompt, detects a head turn with MediaPipe face landmarks, and selects the in-time or too-late cutscene outcome after a ten-second countdown.
+## Demo
 
-Use `/boss-webcam-lab` to tune the isolated webcam window. Sticker position, left/right tilt, the sticker source, countdown length, and both MP4 source placeholders live in `src/game/bossEvent.ts`. Browser-served sticker assets belong under `public/stickers/`; the current source is `public/stickers/friend.png`.
+Paste your YouTube link here:
+
+`https://youtu.be/IIXLs_peAsA`
+
+## Tech Stack
+
+- React and TypeScript
+- TanStack Start and TanStack Router
+- Zustand
+- Vite and Tailwind CSS
+- Vitest
+
+## Setup
+
+Requires Node.js and pnpm.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Then open the URL the dev server prints.
+
+## Cheats
+
+- `Ctrl+C` (or `Cmd+C` on macOS) skips to the next boss. It is ignored while typing in a text box, so copy and paste still work.
+- `/gary`, `/denise`, and `/richard` start the game directly at the Manager, Senior Manager, and VP.
