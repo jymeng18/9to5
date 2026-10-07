@@ -6,9 +6,7 @@ A browser game about surviving toxic corporate life, played from a Windows XP-st
 
 ## Demo
 
-Paste your YouTube link here:
-
-`https://youtu.be/IIXLs_peAsA`
+[Watch the demo](https://youtu.be/IIXLs_peAsA)
 
 ## Tech Stack
 
